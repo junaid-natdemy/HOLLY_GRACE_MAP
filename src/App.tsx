@@ -37,6 +37,7 @@ import { MobileBottomSheet } from './components/navigation/MobileBottomSheet';
 import { DestinationSearchModal } from './components/navigation/DestinationSearchModal';
 import { useIsMobile } from './hooks/useIsMobile';
 import { Sparkles } from 'lucide-react';
+import { WelcomeScreen } from './components/WelcomeScreen';
 
 const ROAD_NETWORK_STORAGE_KEY = 'holly_grace_manual_road_network';
 const CAMPUS_POSITIONS_STORAGE_KEY = 'holly_grace_campus_positions';
@@ -74,7 +75,10 @@ export const App: React.FC = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         const baseline = getDefaultCampusStages();
-        if (Array.isArray(parsed) && parsed.length >= baseline.length) return parsed;
+        if (Array.isArray(parsed) && parsed.length >= baseline.length) {
+          // VIP Parking is a named place only, never a numbered stage.
+          return parsed.filter((stage: Stage) => stage.positionId !== 10);
+        }
       }
     } catch {
       // ignore
@@ -1330,6 +1334,7 @@ export const App: React.FC = () => {
 
       if (!result || result.points.length < 2) {
         setRoute(null);
+        setRoutingError('Could not find a valid walkable path to this destination. Please pick another starting point.');
         return;
       }
       setRoute(result);
@@ -1380,8 +1385,11 @@ export const App: React.FC = () => {
     ? getPositionById(selectedStage.positionId, positions) || null
     : null;
 
+  const [mapImageReady, setMapImageReady] = useState(false);
+
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-slate-950 font-sans text-slate-800">
+    <div className="relative w-screen h-screen overflow-hidden bg-[#7d9a62] font-sans text-slate-800">
+      <WelcomeScreen imageReady={mapImageReady} />
       {/* Interactive Campus Map Viewport */}
       <main className="w-full h-full">
         <CampusMap
@@ -1399,6 +1407,7 @@ export const App: React.FC = () => {
           lastInvalidClick={lastInvalidClick}
           outsideBoundaryToast={outsideBoundaryToast}
           showOutsideGlow={showOutsideGlow}
+          onImageLoad={() => setMapImageReady(true)}
           // Road Network Editor Props
           isEditorOpen={isEditorOpen}
           activeEditorTool={activeEditorTool}
@@ -1464,8 +1473,6 @@ export const App: React.FC = () => {
         onOpenSearch={() => setIsSearchModalOpen(true)}
         onClearDestination={handleClearDestination}
         onResetNavigation={handleResetNavigation}
-        onLogoClick={handleLogoClick}
-        isDevMode={isDevMode}
       />
 
       {/* Mobile contextual bottom drawer (only while a location is selected) */}
@@ -1474,6 +1481,7 @@ export const App: React.FC = () => {
         selectedPosition={selectedPosition}
         stages={stages}
         onSelectStage={handleMobileSelectStage}
+        route={route}
         routingError={routingError}
       />
 

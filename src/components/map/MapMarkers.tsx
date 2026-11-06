@@ -277,7 +277,6 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
               fill={isSelected ? '#1d4ed8' : isDragging ? '#f59e0b' : '#2563eb'}
               stroke="#ffffff"
               strokeWidth="1.2"
-              filter="drop-shadow(0 1px 2px rgba(0,0,0,0.5))"
             />
 
             {/* 2. GOOGLE MAPS STYLE COMPACT MINIMAL BUILDING LABEL PILL */}
@@ -315,8 +314,6 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
                     : 'rgba(15, 23, 42, 0.14)'
                 }
                 strokeWidth={isSelected ? '1.2' : '0.8'}
-                filter="drop-shadow(0 1.5px 3px rgba(0,0,0,0.28))"
-                className="transition-colors duration-150"
               />
 
               {/* Mini Category POI Icon Circle */}

@@ -44,12 +44,12 @@ export const DestinationSearchModal: React.FC<DestinationSearchModalProps> = ({
   if (!isOpen || !isMobileViewport) return null;
 
   return (
-    <div className="fixed inset-0 z-40 md:hidden animate-fade-in">
+    <div data-destination-sheet className="fixed inset-0 z-40 md:hidden animate-fade-in">
       {/* Transparent click-catcher: the campus map stays fully visible (no blur or dimming) */}
       <div className="absolute inset-0" onClick={onClose} />
 
-      {/* Compact mobile bottom sheet */}
-      <div className="absolute inset-x-0 bottom-0 flex h-[min(78vh,600px)] flex-col overflow-hidden rounded-t-[22px] border-t border-slate-200 bg-white shadow-[0_-16px_40px_-12px_rgba(15,23,42,0.25)]">
+      {/* Compact mobile bottom sheet. z-10 keeps taps on the list above the click-catcher. */}
+      <div className="absolute inset-x-0 bottom-0 z-10 flex h-[min(78dvh,600px)] flex-col overflow-hidden rounded-t-[22px] border-t border-slate-200 bg-white shadow-[0_-16px_40px_-12px_rgba(15,23,42,0.25)]">
         <div className="flex shrink-0 justify-center pb-1 pt-2">
           <span className="h-1 w-10 rounded-full bg-slate-200" />
         </div>

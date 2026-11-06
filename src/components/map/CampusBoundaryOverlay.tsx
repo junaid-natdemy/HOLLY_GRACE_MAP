@@ -16,6 +16,8 @@ export interface CampusBoundaryOverlayProps {
   onNodeDrag?: (nodeId: string, pt: PixelPoint) => void;
   lastInvalidClick?: PixelPoint | null;
   showOutsideGlow?: boolean;
+  /** Screen pixels per map pixel, so the warning mark stays small when zoomed. */
+  mapScale?: number;
 }
 
 export const CampusBoundaryOverlay: React.FC<CampusBoundaryOverlayProps> = ({
@@ -33,6 +35,7 @@ export const CampusBoundaryOverlay: React.FC<CampusBoundaryOverlayProps> = ({
   onNodeDrag,
   lastInvalidClick,
   showOutsideGlow = false,
+  mapScale = 1,
 }) => {
   const draggingNodeIdRef = useRef<string | null>(null);
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
@@ -105,75 +108,24 @@ export const CampusBoundaryOverlay: React.FC<CampusBoundaryOverlayProps> = ({
 
   return (
     <g className="campus-boundary-layer select-none">
-      <defs>
-        {/* Glow filter for out-of-boundary red perimeter */}
-        <filter id="redBoundaryGlow" x="-30%" y="-30%" width="160%" height="160%">
-          <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#ef4444" floodOpacity="0.95" />
-          <feDropShadow dx="0" dy="0" stdDeviation="12" floodColor="#dc2626" floodOpacity="0.6" />
-        </filter>
-
-        {/* Diagonal danger stripes for out-of-boundary forbidden areas */}
-        <pattern
-          id="forbiddenHatch"
-          width="24"
-          height="24"
-          patternTransform="rotate(45 0 0)"
-          patternUnits="userSpaceOnUse"
-        >
-          <line
-            x1="0"
-            y1="0"
-            x2="0"
-            y2="24"
-            stroke="rgba(239, 68, 68, 0.45)"
-            strokeWidth="5"
-          />
-        </pattern>
-      </defs>
-
       {/* ============================================================== */}
-      {/* 1. OUT-OF-BOUNDARY RED GLOWING AREA (Triggered on Forest Click) */}
+      {/* 1. OUT-OF-BOUNDARY RED AREA (plain paint, no blur or animation) */}
       {/* ============================================================== */}
       {showOutsideGlow && invertedPathD && perimeterPathD && (
-        <g className="out-of-bounds-alert pointer-events-none transition-opacity duration-300">
-          {/* Deep red pulsating wash covering all outer forest areas */}
+        <g className="out-of-bounds-alert pointer-events-none">
           <path
             d={invertedPathD}
             fillRule="evenodd"
-            fill="rgba(220, 38, 38, 0.38)"
-            className="animate-pulse"
+            fill="rgba(220, 38, 38, 0.32)"
           />
-
-          {/* Warning diagonal stripes over forbidden area */}
-          <path
-            d={invertedPathD}
-            fillRule="evenodd"
-            fill="url(#forbiddenHatch)"
-            opacity="0.8"
-          />
-
-          {/* Neon Red glowing halo along campus perimeter */}
           <path
             d={perimeterPathD}
             fill="none"
             stroke="#ef4444"
-            strokeWidth="6"
+            strokeWidth="2"
             strokeLinejoin="round"
             strokeLinecap="round"
-            filter="url(#redBoundaryGlow)"
-            opacity="0.95"
-          />
-
-          {/* Core White-and-Red Alert Line along perimeter */}
-          <path
-            d={perimeterPathD}
-            fill="none"
-            stroke="#ffffff"
-            strokeWidth="2.5"
-            strokeDasharray="8 6"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            className="animate-route-dash"
+            vectorEffect="non-scaling-stroke"
           />
         </g>
       )}
@@ -251,10 +203,15 @@ export const CampusBoundaryOverlay: React.FC<CampusBoundaryOverlayProps> = ({
       {lastInvalidClick && (
         <g
           transform={`translate(${lastInvalidClick.x}, ${lastInvalidClick.y})`}
-          className="pointer-events-none animate-ping"
+          className="pointer-events-none"
         >
-          <circle r="30" fill="rgba(239, 68, 68, 0.35)" stroke="#ef4444" strokeWidth="3" />
-          <circle r="14" fill="rgba(239, 68, 68, 0.75)" />
+          <circle
+            r={14 / Math.max(mapScale, 0.2)}
+            fill="rgba(239, 68, 68, 0.28)"
+            stroke="#ef4444"
+            strokeWidth={1.5 / Math.max(mapScale, 0.2)}
+          />
+          <circle r={5 / Math.max(mapScale, 0.2)} fill="rgba(239, 68, 68, 0.9)" />
         </g>
       )}
 

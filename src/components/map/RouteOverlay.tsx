@@ -24,16 +24,6 @@ export const RouteOverlay: React.FC<RouteOverlayProps> = ({
 
   return (
     <g className="route-overlay-layer">
-      <defs>
-        {/* Glow filter for route line contrast against aerial photograph */}
-        <filter id="routeGlow" x="-30%" y="-30%" width="160%" height="160%">
-          <feDropShadow dx="0" dy="1" stdDeviation="3" floodColor="#000000" floodOpacity="0.6" />
-        </filter>
-        <filter id="markerShadow" x="-30%" y="-30%" width="160%" height="160%">
-          <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#000000" floodOpacity="0.45" />
-        </filter>
-      </defs>
-
       {/* 1. Deep blue outer halo backing */}
       <path
         d={pathData}
@@ -76,20 +66,18 @@ export const RouteOverlay: React.FC<RouteOverlayProps> = ({
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeDasharray="6 9"
-        className="animate-route-dash"
-        filter="url(#routeGlow)"
       />
 
       {/* Start Point Marker (User Origin / Entrance) */}
       <g transform={`translate(${startPoint.x}, ${startPoint.y})`}>
-        <circle r="10" fill="#3b82f6" opacity="0.3" className="animate-ping-slow" />
-        <circle r="7" fill="#1d4ed8" stroke="#ffffff" strokeWidth="2.5" filter="url(#markerShadow)" />
+        <circle r="10" fill="#3b82f6" opacity="0.3" />
+        <circle r="7" fill="#1d4ed8" stroke="#ffffff" strokeWidth="2.5" />
         <circle r="2.5" fill="#ffffff" />
       </g>
 
       {/* Destination Point Marker */}
-      <g transform={`translate(${endPoint.x}, ${endPoint.y})`} filter="url(#markerShadow)">
-        <circle r="16" fill="#dc2626" opacity="0.25" className="animate-pulse" />
+      <g transform={`translate(${endPoint.x}, ${endPoint.y})`}>
+        <circle r="16" fill="#dc2626" opacity="0.25" />
         <circle r="11" fill="#ef4444" stroke="#ffffff" strokeWidth="2.5" />
         <text
           x="0"

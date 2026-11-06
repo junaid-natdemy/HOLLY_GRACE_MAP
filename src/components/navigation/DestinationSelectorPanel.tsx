@@ -36,8 +36,12 @@ export const DestinationSelectorPanel: React.FC<DestinationSelectorPanelProps> =
   const inputRef = useRef<HTMLInputElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
-  // Focus the search field on mount (component only mounts while open)
+  // Focus the search field on mount for keyboard users. On touch screens the
+  // keyboard would cover the list and the first tap would only dismiss it,
+  // so the chosen destination never registers.
   useEffect(() => {
+    const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
+    if (coarsePointer || window.innerWidth < 768) return;
     const timer = setTimeout(() => inputRef.current?.focus(), 40);
     return () => clearTimeout(timer);
   }, []);

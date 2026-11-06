@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { CampusPosition, Stage } from '../../types/campus';
-import { ChevronDown, ChevronUp, Building2, Check, MapPin } from 'lucide-react';
+import { CampusPosition, RouteResult, Stage } from '../../types/campus';
+import { ChevronDown, ChevronUp, Building2, Check, MapPin, Footprints, X } from 'lucide-react';
 import { formatBuildingDisplayName } from '../../config/campusPositions';
 
 interface MobileBottomSheetProps {
@@ -8,6 +8,8 @@ interface MobileBottomSheetProps {
   selectedPosition: CampusPosition | null;
   stages: Stage[];
   onSelectStage: (stage: Stage) => void;
+  route?: RouteResult | null;
+  onClearRoute?: () => void;
   routingError?: string | null;
 }
 
@@ -15,7 +17,7 @@ interface MobileBottomSheetProps {
  * Contextual mobile information drawer.
  *
  * It only exists while a location is selected: collapsed it names the building,
- * the chosen stage and its position, and dragging it up reveals every stage in
+ * the chosen stage, route status and its position, and dragging it up reveals every stage in
  * that building so another one can be picked without leaving the map.
  */
 export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
@@ -23,6 +25,8 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
   selectedPosition,
   stages,
   onSelectStage,
+  route = null,
+  onClearRoute,
   routingError = null,
 }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
@@ -67,15 +71,6 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
     if (!selectedPosition) return [];
     return stages.filter((s) => s.positionId === selectedPosition.id);
   }, [stages, selectedPosition]);
-
-  const floors = useMemo(() => {
-    const unique: string[] = [];
-    for (const stage of buildingStages) {
-      const floor = stage.floor?.trim();
-      if (floor && !unique.includes(floor)) unique.push(floor);
-    }
-    return unique;
-  }, [buildingStages]);
 
   if (!selectedStage || !selectedPosition) return null;
 
@@ -155,11 +150,44 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
                 ? selectedStage.name.trim()
                 : selectedPosition.description}
             </p>
+            {route && (
+              <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                <span className="inline-flex items-center gap-1 text-[9px] font-bold text-blue-700 bg-blue-50 border border-blue-200/80 px-1.5 py-0.5 rounded-md">
+                  <Footprints className="h-2.5 w-2.5" />
+                  <span>Walkway Active</span>
+                </span>
+                {route.calibratedDistanceMeters && (
+                  <span className="text-[9.5px] font-semibold text-slate-500">
+                    {route.calibratedDistanceMeters}m
+                  </span>
+                )}
+                {route.estimatedWalkingMinutes && (
+                  <span className="text-[9.5px] font-semibold text-slate-500">
+                    · ~{route.estimatedWalkingMinutes} min
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600">
-            <ChevronUp className="h-4 w-4" />
-          </span>
+          <div className="flex items-center gap-1 shrink-0">
+            {onClearRoute && route && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClearRoute();
+                }}
+                className="flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                title="Clear route"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-600">
+              <ChevronUp className="h-4 w-4" />
+            </span>
+          </div>
         </div>
       )}
 
@@ -200,25 +228,7 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
             <span className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-slate-500">
               {buildingStages.length} {buildingStages.length === 1 ? 'stage' : 'stages'}
             </span>
-            {floors.length > 0 && (
-              <span className="rounded-md bg-amber-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-amber-700">
-                {floors.length} {floors.length === 1 ? 'floor' : 'floors'}
-              </span>
-            )}
           </div>
-
-          {floors.length > 0 && (
-            <div className="scrollbar-none flex shrink-0 items-center gap-1.5 overflow-x-auto border-b border-slate-100 px-4 py-2">
-              {floors.map((floor) => (
-                <span
-                  key={`floor-${floor}`}
-                  className="shrink-0 whitespace-nowrap rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[9.5px] font-semibold text-slate-600"
-                >
-                  {floor}
-                </span>
-              ))}
-            </div>
-          )}
 
           <div className="flex-1 space-y-1.5 overflow-y-auto overscroll-contain px-3 pb-4 pt-2">
             {buildingStages.length === 0 ? (

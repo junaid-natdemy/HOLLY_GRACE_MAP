@@ -219,12 +219,6 @@ export const CAMPUS_STAGES: Stage[] = [
     category: "Main Stage"
   },
   {
-    stageNumber: 34,
-    name: "Ground",
-    positionId: 10,
-    category: "Ground"
-  },
-  {
     stageNumber: 7,
     name: "STAGE-7",
     positionId: 11,

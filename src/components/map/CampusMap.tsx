@@ -30,6 +30,7 @@ interface CampusMapProps {
   lastInvalidClick?: PixelPoint | null;
   outsideBoundaryToast?: string | null;
   showOutsideGlow?: boolean;
+  onImageLoad?: () => void;
   /** Increment to return the map to its initial pan/zoom (mobile reset). */
   resetViewSignal?: number;
 
@@ -81,6 +82,7 @@ export const CampusMap: React.FC<CampusMapProps> = ({
   lastInvalidClick = null,
   outsideBoundaryToast = null,
   showOutsideGlow = false,
+  onImageLoad,
   resetViewSignal = 0,
 
   // Editor props
@@ -117,8 +119,10 @@ export const CampusMap: React.FC<CampusMapProps> = ({
 }) => {
   const {
     containerRef,
+    stageRef,
     zoom,
     pan,
+    baseScale,
     stageWidth,
     stageHeight,
     isDragging,
@@ -128,18 +132,18 @@ export const CampusMap: React.FC<CampusMapProps> = ({
     handlers,
   } = useMapTransform();
 
-  // Mobile only: centre the map on a freshly selected destination.
-  const lastFocusedPositionId = useRef<number | null>(null);
+  // Centre the map on a freshly selected destination (mobile and desktop)
+  const lastFocusedKey = useRef<string | null>(null);
   useEffect(() => {
     if (!selectedPosition) {
-      lastFocusedPositionId.current = null;
+      lastFocusedKey.current = null;
       return;
     }
-    if (lastFocusedPositionId.current === selectedPosition.id) return;
-    if (typeof window === 'undefined' || !window.matchMedia('(max-width: 767px)').matches) return;
-    lastFocusedPositionId.current = selectedPosition.id;
-    focusOnCoordinate(selectedPosition.pixelCoord, 1.6);
-  }, [selectedPosition, focusOnCoordinate]);
+    const currentKey = `${selectedPosition.id}-${selectedStageNumber ?? 0}`;
+    if (lastFocusedKey.current === currentKey) return;
+    lastFocusedKey.current = currentKey;
+    focusOnCoordinate(selectedPosition.pixelCoord);
+  }, [selectedPosition, selectedStageNumber, focusOnCoordinate]);
 
   // Mobile reset returns the map to its initial pan/zoom.
   useEffect(() => {
@@ -229,7 +233,7 @@ export const CampusMap: React.FC<CampusMapProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`absolute inset-x-0 top-[calc(10px+var(--mobile-header-h,93px))] bottom-[var(--mobile-sheet-h,77px)] md:inset-0 overflow-hidden bg-slate-950 select-none ${cursorClass}`}
+      className={`absolute inset-0 overflow-hidden bg-[#7d9a62] select-none touch-none ${cursorClass}`}
       {...handlers}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
@@ -238,7 +242,8 @@ export const CampusMap: React.FC<CampusMapProps> = ({
     >
       {/* Interactive Transform Canvas */}
       <div
-        className="absolute top-1/2 left-1/2 origin-center will-change-transform shadow-2xl"
+        ref={stageRef}
+        className="absolute top-1/2 left-1/2 origin-center will-change-transform"
         style={{
           width: `${stageWidth}px`,
           height: `${stageHeight}px`,
@@ -247,7 +252,7 @@ export const CampusMap: React.FC<CampusMapProps> = ({
         }}
       >
         {/* Raster drone aerial background */}
-        <MapImage />
+        <MapImage onLoad={onImageLoad} />
 
         {/* SVG Overlay layer matching native image resolution (1280x774) */}
         <svg
@@ -272,6 +277,7 @@ export const CampusMap: React.FC<CampusMapProps> = ({
               onNodeDrag={onBoundaryNodeDrag}
               lastInvalidClick={lastInvalidClick}
               showOutsideGlow={showOutsideGlow}
+              mapScale={baseScale * zoom}
             />
           )}
 

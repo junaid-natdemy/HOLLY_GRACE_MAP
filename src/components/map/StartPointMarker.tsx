@@ -13,7 +13,7 @@ export const StartPointMarker: React.FC<StartPointMarkerProps> = ({ point }) => 
   return (
     <g className="start-point-marker" transform={`translate(${x}, ${y})`}>
       {/* Outer pulsing radar ring */}
-      <circle r="18" fill="#10b981" fillOpacity="0.25" className="animate-ping-slow" />
+      <circle r="18" fill="#10b981" fillOpacity="0.25" />
 
       {/* Middle glowing aura */}
       <circle r="10" fill="#34d399" fillOpacity="0.45" />
@@ -24,7 +24,6 @@ export const StartPointMarker: React.FC<StartPointMarkerProps> = ({ point }) => 
         fill="#059669"
         stroke="#ffffff"
         strokeWidth="2.5"
-        filter="drop-shadow(0 2px 4px rgba(0,0,0,0.4))"
       />
 
       {/* Center white dot */}
@@ -40,7 +39,6 @@ export const StartPointMarker: React.FC<StartPointMarkerProps> = ({ point }) => 
           rx="4"
           fill="#065f46"
           opacity="0.95"
-          filter="drop-shadow(0 1px 3px rgba(0,0,0,0.3))"
         />
         <text
           x="0"

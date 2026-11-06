@@ -11,14 +11,22 @@ export const MapImage: React.FC<MapImageProps> = ({ onLoad }) => {
   return (
     <div className="relative w-full h-full select-none pointer-events-none">
       <img
+        ref={(node) => {
+          if (node?.complete && node.naturalWidth > 0) onLoad?.();
+        }}
         src={MAP_CONFIG.imageUrl}
         alt="Holly Grace Campus Map"
         width={MAP_CONFIG.nativeWidth}
         height={MAP_CONFIG.nativeHeight}
         className="w-full h-full block select-none pointer-events-none"
         draggable={false}
+        decoding="async"
+        fetchPriority="high"
         onLoad={onLoad}
-        onError={() => setHasError(true)}
+        onError={() => {
+          setHasError(true);
+          onLoad?.();
+        }}
       />
       {hasError && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 text-gray-700 p-6 text-center">

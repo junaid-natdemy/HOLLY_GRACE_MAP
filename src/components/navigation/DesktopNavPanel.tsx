@@ -106,11 +106,17 @@ export const DesktopNavPanel: React.FC<DesktopNavPanelProps> = ({
     return () => window.removeEventListener('resize', updateDropdownGeometry);
   }, [isSearchOpen, updateDropdownGeometry]);
 
-  // Click outside the field, its trigger or the dropdown closes it
+  // Click outside the desktop field or dropdown closes it.
+  // On a phone this must not run: the same flag opens the mobile sheet, and
+  // closing on mousedown removes that sheet before the tap's click arrives.
+  // The click then falls through onto the map and moves the start point.
   useEffect(() => {
     if (!isSearchOpen) return;
     const handlePointerDown = (event: MouseEvent) => {
-      const target = event.target as Node;
+      if (window.innerWidth < 768) return;
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (target instanceof Element && target.closest('[data-destination-sheet]')) return;
       if (
         dropdownRef.current?.contains(target) ||
         destinationFieldRef.current?.contains(target)

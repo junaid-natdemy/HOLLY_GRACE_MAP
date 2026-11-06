@@ -11,8 +11,6 @@ interface MobileNavHeaderProps {
   onOpenSearch: () => void;
   onClearDestination: () => void;
   onResetNavigation: () => void;
-  onLogoClick?: () => void;
-  isDevMode?: boolean;
 }
 
 /** Nearest named campus landmark to a tapped map point (no geocoding involved). */
@@ -41,8 +39,6 @@ export const MobileNavHeader: React.FC<MobileNavHeaderProps> = ({
   onOpenSearch,
   onClearDestination,
   onResetNavigation,
-  onLogoClick,
-  isDevMode = false,
 }) => {
   const headerRef = useRef<HTMLDivElement | null>(null);
 
@@ -72,22 +68,10 @@ export const MobileNavHeader: React.FC<MobileNavHeaderProps> = ({
   return (
     <div
       ref={headerRef}
-      className="md:hidden absolute top-2.5 left-2.5 right-2.5 z-30 pointer-events-auto animate-slide-down"
+      className="md:hidden fixed top-2.5 left-2.5 right-2.5 z-50 pointer-events-auto animate-slide-down"
     >
       {/* One compact horizontal FROM | TO card */}
       <div className="flex items-center gap-1 rounded-2xl border border-slate-200/80 bg-white/95 p-1.5 shadow-[0_10px_30px_-8px_rgba(15,23,42,0.45)] backdrop-blur-xl">
-        {/* Brand mark (also the hidden developer-mode unlock) */}
-        <div
-          onClick={onLogoClick}
-          className="relative hidden h-9 w-9 shrink-0 cursor-pointer select-none items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-[9px] font-black text-white min-[360px]:flex"
-          title="Holly Grace Campus Navigation"
-        >
-          HG
-          {isDevMode && (
-            <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-cyan-400 ring-2 ring-white" />
-          )}
-        </div>
-
         {/* FROM (set by tapping the map) */}
         <div className="flex min-w-0 flex-1 items-center gap-1.5 rounded-xl px-1 py-1">
           <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500 ring-2 ring-emerald-100" />
