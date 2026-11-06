@@ -1230,7 +1230,6 @@ export const App: React.FC = () => {
   // Handle selecting a destination stage
   const handleSelectStage = useCallback(
     (stage: Stage) => {
-      (window as any).__desktopSelect = ((window as any).__desktopSelect || 0) + 1;
       setSelectedStage(stage);
       setRoutingError(null);
       if (route) {
@@ -1317,8 +1316,6 @@ export const App: React.FC = () => {
   // walking route so the map and the drawer update from a single tap.
   const handleMobileSelectStage = useCallback(
     (stage: Stage) => {
-      (window as any).__mobileSelect = ((window as any).__mobileSelect || 0) + 1;
-      console.log('[mobile-stage] select', stage.stageNumber, stage.positionId);
       setSelectedStage(stage);
       setRoutingError(null);
 
@@ -1331,7 +1328,6 @@ export const App: React.FC = () => {
         positions
       );
 
-      console.log('[mobile-stage] route result', result ? result.points.length : null);
       if (!result || result.points.length < 2) {
         setRoute(null);
         return;
@@ -1478,6 +1474,7 @@ export const App: React.FC = () => {
         selectedPosition={selectedPosition}
         stages={stages}
         onSelectStage={handleMobileSelectStage}
+        routingError={routingError}
       />
 
       {/* Search Destination Modal / Sheet */}

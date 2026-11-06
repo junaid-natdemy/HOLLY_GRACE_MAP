@@ -8,6 +8,7 @@ interface MobileBottomSheetProps {
   selectedPosition: CampusPosition | null;
   stages: Stage[];
   onSelectStage: (stage: Stage) => void;
+  routingError?: string | null;
 }
 
 /**
@@ -22,6 +23,7 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
   selectedPosition,
   stages,
   onSelectStage,
+  routingError = null,
 }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const startYRef = useRef<number>(0);
@@ -109,9 +111,21 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
         <div className="h-1 w-9 rounded-full bg-slate-300" />
       </div>
 
-      {/* COLLAPSED: building, stage, position */}
+      {/* COLLAPSED: building, stage, position (whole row opens the drawer) */}
       {!isExpanded && (
-        <div className="flex items-center gap-2.5 px-3.5 pb-3.5 pt-0.5">
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label="Show building stages"
+          onClick={() => setIsExpanded(true)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setIsExpanded(true);
+            }
+          }}
+          className="flex cursor-pointer items-center gap-2.5 px-3.5 pb-3.5 pt-0.5 active:bg-slate-50"
+        >
           {selectedStage.stageNumber > 0 ? (
             <div className="flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-xl bg-red-600 text-white shadow-sm shadow-red-500/25">
               <span className="text-[7px] font-bold uppercase leading-none tracking-wider opacity-85">
@@ -127,7 +141,7 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
             </div>
           )}
 
-          <div className="min-w-0 flex-1" onClick={() => setIsExpanded(true)}>
+          <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
               <h4 className="truncate text-[12px] font-extrabold leading-tight text-slate-900">
                 {buildingName}
@@ -143,15 +157,16 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setIsExpanded(true)}
-            aria-label="Show building stages"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 active:bg-slate-200"
-          >
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600">
             <ChevronUp className="h-4 w-4" />
-          </button>
+          </span>
         </div>
+      )}
+
+      {!isExpanded && routingError && (
+        <p className="-mt-1.5 px-3.5 pb-2.5 text-[10px] font-semibold leading-snug text-red-600">
+          {routingError}
+        </p>
       )}
 
       {/* EXPANDED: building information and every stage inside it */}

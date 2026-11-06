@@ -20,7 +20,7 @@ function getStartLabel(startPoint: PixelPoint, isCustomStart: boolean, positions
   if (!isCustomStart) return 'Campus South Entrance';
 
   let nearest: CampusPosition | null = null;
-  let nearestDistance = 140;
+  let nearestDistance = 200;
   for (const pos of positions) {
     const distance = Math.hypot(pos.pixelCoord.x - startPoint.x, pos.pixelCoord.y - startPoint.y);
     if (distance < nearestDistance) {
@@ -30,7 +30,7 @@ function getStartLabel(startPoint: PixelPoint, isCustomStart: boolean, positions
   }
 
   if (nearest) return `Near ${formatBuildingDisplayName(nearest.name)}`;
-  return `Pin ${Math.round(startPoint.x)}, ${Math.round(startPoint.y)}`;
+  return 'Custom pin';
 }
 
 export const MobileNavHeader: React.FC<MobileNavHeaderProps> = ({
