@@ -78,7 +78,7 @@ export const CAMPUS_POSITIONS: CampusPosition[] = [
   },
   {
     id: 6,
-    name: "College Block",
+    name: "College Block · Engineering / Polytechnic",
     description: "Upper Campus Main Academic Ribbon",
     pixelCoord: {
       x: 656,

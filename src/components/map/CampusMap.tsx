@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { MAP_CONFIG } from '../../config/mapConfig';
 import { isPointInPolygon } from '../../config/campusBoundary';
 import { useMapTransform } from '../../hooks/useMapTransform';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import {
   BoundaryData,
   CampusPosition,
@@ -131,19 +132,21 @@ export const CampusMap: React.FC<CampusMapProps> = ({
     clientToNativePixel,
     handlers,
   } = useMapTransform();
+  const isMobileViewport = useIsMobile();
 
-  // Centre the map on a freshly selected destination (mobile and desktop)
+  // Desktop recentres on a new destination. Mobile keeps the current view.
   const lastFocusedKey = useRef<string | null>(null);
   useEffect(() => {
     if (!selectedPosition) {
       lastFocusedKey.current = null;
       return;
     }
+    if (isMobileViewport) return;
     const currentKey = `${selectedPosition.id}-${selectedStageNumber ?? 0}`;
     if (lastFocusedKey.current === currentKey) return;
     lastFocusedKey.current = currentKey;
     focusOnCoordinate(selectedPosition.pixelCoord);
-  }, [selectedPosition, selectedStageNumber, focusOnCoordinate]);
+  }, [selectedPosition, selectedStageNumber, focusOnCoordinate, isMobileViewport]);
 
   // Mobile reset returns the map to its initial pan/zoom.
   useEffect(() => {
@@ -233,7 +236,8 @@ export const CampusMap: React.FC<CampusMapProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`absolute inset-0 overflow-hidden bg-[#7d9a62] select-none touch-none ${cursorClass}`}
+      className={`absolute inset-x-0 top-0 overflow-hidden bg-[#7d9a62] select-none touch-none ${cursorClass}`}
+      style={{ bottom: isMobileViewport ? 'var(--mobile-sheet-h, 0px)' : 0 }}
       {...handlers}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}

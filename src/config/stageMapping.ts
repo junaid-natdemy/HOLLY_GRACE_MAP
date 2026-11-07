@@ -226,9 +226,10 @@ export const CAMPUS_STAGES: Stage[] = [
   },
   {
     stageNumber: 15,
-    name: "STAGE 15 - College Block • Engineering / Polytechnic",
+    name: "STAGE-15 -College Block · Engineering / Polytechnic",
     positionId: 6,
-    floor: "Robotics Lab • GROUND FLOOR"
+    category: "North Wing",
+    floor: "Robotics Lab · GROUND FLOOR"
   }
 ];
 

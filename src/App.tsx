@@ -54,10 +54,15 @@ export const App: React.FC = () => {
         const parsed = JSON.parse(saved);
         const baseline = getDefaultCampusPositions();
         if (Array.isArray(parsed) && parsed.length >= baseline.length) {
-          return parsed.map((p: CampusPosition) => ({
-            ...p,
-            name: formatBuildingDisplayName(p.name),
-          }));
+          return parsed.map((p: CampusPosition) => {
+            const savedName = formatBuildingDisplayName(p.name);
+            const official = baseline.find((item) => item.id === p.id);
+            const officialName = official ? formatBuildingDisplayName(official.name) : savedName;
+            // Keep a longer official name when an older save only stored the short title.
+            const name =
+              officialName.includes('·') && !savedName.includes('·') ? officialName : savedName;
+            return { ...p, name };
+          });
         }
       }
     } catch {
@@ -77,7 +82,14 @@ export const App: React.FC = () => {
         const baseline = getDefaultCampusStages();
         if (Array.isArray(parsed) && parsed.length >= baseline.length) {
           // VIP Parking is a named place only, never a numbered stage.
-          return parsed.filter((stage: Stage) => stage.positionId !== 10);
+          const next = parsed.filter((stage: Stage) => stage.positionId !== 10);
+          const officialStage15 = baseline.find((stage) => stage.stageNumber === 15);
+          if (officialStage15) {
+            const index = next.findIndex((stage: Stage) => stage.stageNumber === 15);
+            if (index === -1) next.push(officialStage15);
+            else next[index] = officialStage15;
+          }
+          return next;
         }
       }
     } catch {

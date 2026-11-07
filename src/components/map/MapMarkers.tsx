@@ -13,6 +13,16 @@ interface MapMarkersProps {
   onPositionDrag?: (positionId: number, pt: PixelPoint) => void;
 }
 
+/** Pixel width of a long pin label, so the pill hugs the words. */
+function measureLongPinText(text: string): number {
+  if (typeof document === 'undefined') return Math.ceil(text.length * 4.05);
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  if (!context) return Math.ceil(text.length * 4.05);
+  context.font = "700 6.8px 'Plus Jakarta Sans', sans-serif";
+  return Math.ceil(context.measureText(text).width);
+}
+
 /**
  * Returns a Google Maps-inspired POI theme (icon & colors) based on building category/name.
  */
@@ -203,20 +213,22 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
         const { x, y } = pos.pixelCoord;
         const canDrag = isEditorOpen && !isPreviewMode;
 
-        // Clean, standard, classic minimal building name
+        // One horizontal row, same height as every other pin. The pill
+        // grows with the full name so the text is not cut off.
         const displayName = formatBuildingDisplayName(pos.name);
         const poiTheme = getCategoryPoiTheme(pos.category, pos.name);
 
-        // Dynamically compute compact pill width hugging the building name
-        // font-size: 6.8px with Plus Jakarta Sans bold
-        const approxCharWidth = 4.2;
-        const textWidth = Math.max(18, Math.round(displayName.length * approxCharWidth));
-        const iconSectionWidth = 10;
-        const paddingX = 5;
+        const approxCharWidth = 4.55;
+        const iconSectionWidth = 14;
+        const paddingX = 6;
         const pillHeight = 13.5;
-        const pillWidth = textWidth + iconSectionWidth + paddingX * 2;
+        const isLongName = displayName.length > 24;
+        const textWidth = isLongName
+          ? measureLongPinText(displayName)
+          : Math.max(18, Math.round(displayName.length * approxCharWidth));
+        const pillWidth = textWidth + iconSectionWidth + (isLongName ? 4 : paddingX);
         const halfWidth = Math.round(pillWidth / 2);
-        const pillY = -17.5; // compact float directly above anchor dot
+        const pillY = -17.5;
 
         return (
           <g
@@ -317,7 +329,7 @@ export const MapMarkers: React.FC<MapMarkersProps> = ({
               />
 
               {/* Mini Category POI Icon Circle */}
-              <g transform={`translate(${-halfWidth + 7}, ${pillY + 6.75})`}>
+              <g transform={`translate(${-halfWidth + 7}, ${pillY + pillHeight / 2})`}>
                 <circle
                   r="4"
                   fill={isSelected ? '#ffffff' : isDragging ? '#ffffff' : poiTheme.bg}
