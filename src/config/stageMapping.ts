@@ -156,6 +156,22 @@ export const CAMPUS_STAGES: Stage[] = [
     "floor": "Ground Floor"
   },
   {
+    "stageNumber": -22,
+    "name": "Green Room",
+    "positionId": 22,
+    "floor": "Ground Floor",
+    "category": "green_room",
+    "tags": ["green room", "makeup", "dressing", "costume", "artists", "zion"]
+  },
+  {
+    "stageNumber": -23,
+    "name": "Green Room",
+    "positionId": 23,
+    "floor": "Ground Floor",
+    "category": "green_room",
+    "tags": ["green room", "makeup", "dressing", "costume", "artists", "divine"]
+  },
+  {
     "stageNumber": 2,
     "name": "VI-G",
     "positionId": 24,
@@ -238,11 +254,12 @@ export function searchStages(query: string, customStages?: Stage[]): Stage[] {
     return list.filter((s) => s.stageNumber === num);
   }
 
-  return list.filter(
-    (s) =>
-      s.name.toLowerCase().includes(trimmed) ||
-      (s.stageNumber > 0 && `stage ${s.stageNumber}`.toLowerCase().includes(trimmed)) ||
-      (s.category && s.category.toLowerCase().includes(trimmed)) ||
-      (s.floor && s.floor.toLowerCase().includes(trimmed))
-  );
+  const tokens = trimmed.split(/\s+/);
+
+  return list.filter((s) => {
+    const combined = `${s.name} ${s.floor || ''} ${s.category || ''} ${(s.tags || []).join(' ')}`.toLowerCase();
+    const stageNumMatch = s.stageNumber > 0 && `stage ${s.stageNumber}`.toLowerCase().includes(trimmed);
+    const tokensMatch = tokens.every((token) => combined.includes(token));
+    return stageNumMatch || tokensMatch;
+  });
 }

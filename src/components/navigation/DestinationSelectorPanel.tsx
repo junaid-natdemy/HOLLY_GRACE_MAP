@@ -245,14 +245,13 @@ export const DestinationSelectorPanel: React.FC<DestinationSelectorPanelProps> =
       if (!isNaN(num) && String(num) === trimmed) {
         list = list.filter((s) => s.stageNumber === num);
       } else {
+        const tokens = trimmed.split(/\s+/);
         list = list.filter((s) => {
           const pos = positionsMap.get(s.positionId);
-          const stageNameMatch = s.name.toLowerCase().includes(trimmed);
-          const stageNumMatch = `stage ${s.stageNumber}`.toLowerCase().includes(trimmed);
-          const categoryMatch = s.category ? s.category.toLowerCase().includes(trimmed) : false;
-          const floorMatch = s.floor ? s.floor.toLowerCase().includes(trimmed) : false;
-          const buildingNameMatch = pos ? pos.name.toLowerCase().includes(trimmed) : false;
-          return stageNameMatch || stageNumMatch || categoryMatch || floorMatch || buildingNameMatch;
+          const combined = `${s.name} ${pos ? pos.name : ''} ${s.floor || ''} ${s.category || ''} ${(s.tags || []).join(' ')}`.toLowerCase();
+          const stageNumMatch = s.stageNumber > 0 && `stage ${s.stageNumber}`.toLowerCase().includes(trimmed);
+          const tokensMatch = tokens.every((token) => combined.includes(token));
+          return stageNumMatch || tokensMatch;
         });
       }
     }
@@ -496,6 +495,9 @@ export const DestinationSelectorPanel: React.FC<DestinationSelectorPanelProps> =
                   const buildingName = positionsMap.get(stage.positionId)
                     ? formatBuildingDisplayName(positionsMap.get(stage.positionId)!.name)
                     : 'Campus Building';
+                  const isGreenRoom =
+                    stage.category === 'green_room' ||
+                    stage.name.toLowerCase().includes('green room');
 
                   return (
                     <button
@@ -508,6 +510,8 @@ export const DestinationSelectorPanel: React.FC<DestinationSelectorPanelProps> =
                       className={`group flex min-h-[56px] w-full cursor-pointer items-center gap-2.5 rounded-xl px-2 py-1.5 text-left transition-colors ${
                         isCurrent
                           ? 'bg-[#f4f2ff] ring-1 ring-inset ring-indigo-200'
+                          : isGreenRoom
+                          ? 'hover:bg-emerald-50/60'
                           : 'hover:bg-slate-50'
                       }`}
                     >
@@ -515,7 +519,11 @@ export const DestinationSelectorPanel: React.FC<DestinationSelectorPanelProps> =
                       <div
                         className={`flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-[10px] font-extrabold ${
                           isCurrent
-                            ? 'bg-[#2e2b8f] text-white'
+                            ? isGreenRoom
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-[#2e2b8f] text-white'
+                            : isGreenRoom
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                             : 'bg-[#ede9fe] text-[#2e2b8f]'
                         }`}
                       >
@@ -528,6 +536,15 @@ export const DestinationSelectorPanel: React.FC<DestinationSelectorPanelProps> =
                               {stage.stageNumber}
                             </span>
                           </>
+                        ) : isGreenRoom ? (
+                          <>
+                            <span className="text-[6.5px] font-black uppercase leading-none tracking-wider opacity-85">
+                              ROOM
+                            </span>
+                            <span className="mt-0.5 text-[12px] font-black leading-none">
+                              GR
+                            </span>
+                          </>
                         ) : (
                           <span className="text-[10px] font-black uppercase leading-none">
                             MAIN
@@ -537,8 +554,13 @@ export const DestinationSelectorPanel: React.FC<DestinationSelectorPanelProps> =
 
                       {/* Details: title, building, floor */}
                       <div className="min-w-0 flex-1">
-                        <div className="truncate text-[12px] font-bold leading-snug text-slate-900">
-                          {stage.name.trim()}
+                        <div className="truncate text-[12px] font-bold leading-snug text-slate-900 flex items-center gap-1.5">
+                          <span>{stage.name.trim()}</span>
+                          {isGreenRoom && (
+                            <span className="whitespace-nowrap rounded border border-emerald-200 bg-emerald-50 px-1.5 py-[2px] text-[8.5px] font-bold uppercase leading-none text-emerald-800">
+                              Dressing Room
+                            </span>
+                          )}
                         </div>
                         <div className="mt-[3px] flex flex-wrap items-center gap-x-2 gap-y-1">
                           <span className="whitespace-nowrap text-[10.5px] font-medium leading-none text-slate-500">

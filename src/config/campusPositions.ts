@@ -321,7 +321,7 @@ export const CAMPUS_POSITIONS: CampusPosition[] = [
   {
     "id": 22,
     "name": "Zion Block",
-    "description": "",
+    "description": "Includes Stage 7 (Lunch Area Stage) & Green Room",
     "pixelCoord": {
       "x": 664.4,
       "y": 631.3
@@ -336,7 +336,7 @@ export const CAMPUS_POSITIONS: CampusPosition[] = [
   {
     "id": 23,
     "name": "Divine Block",
-    "description": "",
+    "description": "Includes Green Room",
     "pixelCoord": {
       "x": 540,
       "y": 678

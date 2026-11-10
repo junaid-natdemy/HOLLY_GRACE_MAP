@@ -478,6 +478,9 @@ export const DesktopNavPanel: React.FC<DesktopNavPanelProps> = ({
                   const isCurrent =
                     selectedStage.stageNumber === stg.stageNumber &&
                     selectedStage.positionId === stg.positionId;
+                  const isGreenRoom =
+                    stg.category === 'green_room' ||
+                    stg.name.toLowerCase().includes('green room');
 
                   return (
                     <button
@@ -487,27 +490,43 @@ export const DesktopNavPanel: React.FC<DesktopNavPanelProps> = ({
                       className={`group flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors ${
                         isCurrent
                           ? 'bg-[#f4f2ff] ring-1 ring-inset ring-indigo-200'
+                          : isGreenRoom
+                          ? 'hover:bg-emerald-50/60'
                           : 'hover:bg-slate-50'
                       }`}
                     >
                       <span
                         className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[10px] font-black ${
                           isCurrent
-                            ? 'bg-[#2e2b8f] text-white'
+                            ? isGreenRoom
+                              ? 'bg-emerald-600 text-white'
+                              : 'bg-[#2e2b8f] text-white'
+                            : isGreenRoom
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                             : 'bg-slate-100 text-slate-700'
                         }`}
                       >
-                        {stg.stageNumber > 0 ? stg.stageNumber : '★'}
+                        {stg.stageNumber > 0 ? (
+                          stg.stageNumber
+                        ) : isGreenRoom ? (
+                          <span className="text-[8px] font-black">GR</span>
+                        ) : (
+                          '★'
+                        )}
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-[10.5px] font-bold text-slate-900">
                           {stg.name}
                         </span>
-                        {stg.floor && (
+                        {isGreenRoom ? (
+                          <span className="mt-0.5 block truncate text-[8.5px] font-bold uppercase tracking-wide text-emerald-700">
+                            Green Room • {stg.floor || 'Ground'}
+                          </span>
+                        ) : stg.floor ? (
                           <span className="mt-0.5 block truncate text-[8.5px] font-bold uppercase tracking-wide text-amber-700/80">
                             {stg.floor}
                           </span>
-                        )}
+                        ) : null}
                       </span>
                       {isCurrent && (
                         <Check className="h-3 w-3 shrink-0 stroke-[3] text-[#2e2b8f]" />

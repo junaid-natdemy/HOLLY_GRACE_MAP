@@ -224,17 +224,16 @@ export const DestinationDropdown: React.FC<DestinationDropdownProps> = ({
 
     if (trimmed) {
       const num = parseInt(trimmed, 10);
-      if (!isNaN(num)) {
+      if (!isNaN(num) && String(num) === trimmed) {
         list = list.filter((s) => s.stageNumber === num);
       } else {
+        const tokens = trimmed.split(/\s+/);
         list = list.filter((s) => {
           const pos = positionsMap.get(s.positionId);
-          const stageNameMatch = s.name.toLowerCase().includes(trimmed);
-          const stageNumMatch = `stage ${s.stageNumber}`.toLowerCase().includes(trimmed);
-          const categoryMatch = s.category ? s.category.toLowerCase().includes(trimmed) : false;
-          const floorMatch = s.floor ? s.floor.toLowerCase().includes(trimmed) : false;
-          const buildingNameMatch = pos ? pos.name.toLowerCase().includes(trimmed) : false;
-          return stageNameMatch || stageNumMatch || categoryMatch || floorMatch || buildingNameMatch;
+          const combined = `${s.name} ${pos ? pos.name : ''} ${s.floor || ''} ${s.category || ''} ${(s.tags || []).join(' ')}`.toLowerCase();
+          const stageNumMatch = s.stageNumber > 0 && `stage ${s.stageNumber}`.toLowerCase().includes(trimmed);
+          const tokensMatch = tokens.every((token) => combined.includes(token));
+          return stageNumMatch || tokensMatch;
         });
       }
     }
@@ -460,6 +459,9 @@ export const DestinationDropdown: React.FC<DestinationDropdownProps> = ({
                     selectedStage?.stageNumber === stage.stageNumber &&
                     selectedStage?.positionId === stage.positionId;
                   const pos = positionsMap.get(stage.positionId);
+                  const isGreenRoom =
+                    stage.category === 'green_room' ||
+                    stage.name.toLowerCase().includes('green room');
 
                   return (
                     <button
@@ -472,6 +474,8 @@ export const DestinationDropdown: React.FC<DestinationDropdownProps> = ({
                       className={`w-full flex items-center justify-between p-2.5 text-left transition-colors ${
                         isCurrent
                           ? 'bg-blue-50/80 text-blue-900 font-bold'
+                          : isGreenRoom
+                          ? 'hover:bg-emerald-50/60 text-slate-800'
                           : 'hover:bg-slate-50 text-slate-800'
                       }`}
                     >
@@ -479,17 +483,32 @@ export const DestinationDropdown: React.FC<DestinationDropdownProps> = ({
                         <div
                           className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
                             isCurrent
-                              ? 'bg-[#2e2b8f] text-white'
+                              ? isGreenRoom
+                                ? 'bg-emerald-600 text-white'
+                                : 'bg-[#2e2b8f] text-white'
+                              : isGreenRoom
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                               : 'bg-[#ede9fe] text-[#2e2b8f]'
                           }`}
                         >
-                          {stage.stageNumber > 0 ? stage.stageNumber : '★'}
+                          {stage.stageNumber > 0 ? (
+                            stage.stageNumber
+                          ) : isGreenRoom ? (
+                            <span className="text-[10px] font-black">GR</span>
+                          ) : (
+                            '★'
+                          )}
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <span className="text-xs font-semibold truncate leading-tight">
                               {stage.name}
                             </span>
+                            {isGreenRoom && (
+                              <span className="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[8.5px] font-bold uppercase shrink-0">
+                                Dressing / Green Room
+                              </span>
+                            )}
                             {stage.floor && (
                               <span className="px-1.5 py-0.2 rounded bg-amber-50 text-amber-700 border border-amber-200/80 text-[9px] font-semibold shrink-0">
                                 {stage.floor}

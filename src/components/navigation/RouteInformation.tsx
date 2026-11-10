@@ -40,8 +40,17 @@ export const RouteInformation: React.FC<RouteInformationProps> = ({
       <div className="flex items-center justify-between gap-3 mb-2.5">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex flex-col items-center justify-center font-extrabold shrink-0 shadow-sm">
-            <span className="text-[9px] uppercase tracking-wider opacity-80 leading-none">Stage</span>
-            <span className="text-base leading-tight">{selectedStage.stageNumber}</span>
+            {selectedStage.stageNumber > 0 ? (
+              <>
+                <span className="text-[9px] uppercase tracking-wider opacity-80 leading-none">Stage</span>
+                <span className="text-base leading-tight">{selectedStage.stageNumber}</span>
+              </>
+            ) : (
+              <>
+                <span className="text-[7.5px] uppercase tracking-wider opacity-80 leading-none">Room</span>
+                <span className="text-sm font-black leading-tight">GR</span>
+              </>
+            )}
           </div>
 
           <div className="min-w-0">
@@ -81,7 +90,9 @@ export const RouteInformation: React.FC<RouteInformationProps> = ({
           <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
           <span className="font-semibold text-slate-600 shrink-0">Destination:</span>
           <span className="text-slate-900 truncate">
-            Stage {selectedStage.stageNumber} • {position?.name}
+            {selectedStage.stageNumber > 0
+              ? `Stage ${selectedStage.stageNumber} • ${position?.name}`
+              : `${selectedStage.name} • ${position?.name}`}
           </span>
         </div>
       </div>

@@ -252,6 +252,9 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
                 const isSelected =
                   selectedStage.stageNumber === stage.stageNumber &&
                   selectedStage.positionId === stage.positionId;
+                const isGreenRoom =
+                  stage.category === 'green_room' ||
+                  stage.name.toLowerCase().includes('green room');
 
                 return (
                   <button
@@ -264,12 +267,20 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
                     className={`flex w-full items-center gap-2.5 rounded-xl border px-2.5 py-2 text-left transition-colors ${
                       isSelected
                         ? 'border-blue-400 bg-blue-50/80 ring-1 ring-blue-500/20'
+                        : isGreenRoom
+                        ? 'border-emerald-200 bg-emerald-50/30 active:bg-emerald-50'
                         : 'border-slate-200/80 bg-white active:bg-slate-50'
                     }`}
                   >
                     <div
                       className={`flex h-8 w-8 shrink-0 flex-col items-center justify-center rounded-lg font-extrabold ${
-                        isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-800'
+                        isSelected
+                          ? isGreenRoom
+                            ? 'bg-emerald-600 text-white'
+                            : 'bg-blue-600 text-white'
+                          : isGreenRoom
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                          : 'bg-slate-100 text-slate-800'
                       }`}
                     >
                       {stage.stageNumber > 0 ? (
@@ -279,19 +290,31 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
                           </span>
                           <span className="text-[11px] font-black leading-none">{stage.stageNumber}</span>
                         </>
+                      ) : isGreenRoom ? (
+                        <>
+                          <span className="text-[6px] font-bold uppercase leading-none tracking-wider opacity-80">
+                            ROOM
+                          </span>
+                          <span className="text-[10px] font-black leading-none">GR</span>
+                        </>
                       ) : (
                         <span className="text-[9px] font-black uppercase leading-none">MAIN</span>
                       )}
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-[11.5px] font-bold leading-tight text-slate-900">
-                        {stage.name.trim()}
+                      <div className="truncate text-[11.5px] font-bold leading-tight text-slate-900 flex items-center gap-1.5">
+                        <span>{stage.name.trim()}</span>
+                        {isGreenRoom && (
+                          <span className="rounded bg-emerald-100 px-1 py-0.2 text-[8px] font-bold uppercase text-emerald-800">
+                            Green Room
+                          </span>
+                        )}
                       </div>
                       <div className="mt-0.5 flex items-center gap-1.5">
                         <MapPin className="h-2.5 w-2.5 shrink-0 text-slate-400" />
                         <span className="truncate text-[10px] font-medium text-slate-500">
-                          {stage.floor?.trim() || 'Main ground level'}
+                          {stage.floor?.trim() || 'Ground level'}
                         </span>
                       </div>
                     </div>
