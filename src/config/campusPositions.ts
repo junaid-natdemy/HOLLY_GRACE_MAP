@@ -323,12 +323,12 @@ export const CAMPUS_POSITIONS: CampusPosition[] = [
     "name": "Zion Block",
     "description": "Includes Stage 7 (Lunch Area Stage) & Green Room",
     "pixelCoord": {
-      "x": 664.4,
-      "y": 631.3
+      "x": 676,
+      "y": 613
     },
     "normalizedCoord": {
-      "x": 0.5895297249334516,
-      "y": 0.4522206303724928
+      "x": 0.5998225377107365,
+      "y": 0.4391117478510029
     },
     "roadNetworkNodeId": "node_53skt",
     "category": "academic"
@@ -338,12 +338,12 @@ export const CAMPUS_POSITIONS: CampusPosition[] = [
     "name": "Divine Block",
     "description": "Includes Green Room",
     "pixelCoord": {
-      "x": 540,
-      "y": 678
+      "x": 603.9,
+      "y": 689.7
     },
     "normalizedCoord": {
-      "x": 0.47914818101153506,
-      "y": 0.48567335243553006
+      "x": 0.5358473824312333,
+      "y": 0.494054441260745
     },
     "roadNetworkNodeId": "node_53skt",
     "category": "academic"
@@ -440,10 +440,6 @@ export const CAMPUS_POSITIONS: CampusPosition[] = [
   }
 ];
 
-/**
- * Formats any raw or legacy building name into a standard, classic, minimal,
- * premium Google Maps-style building name.
- */
 export function formatBuildingDisplayName(rawName: string): string {
   if (!rawName) return '';
   return rawName.trim();

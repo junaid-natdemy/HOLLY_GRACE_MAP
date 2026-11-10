@@ -161,7 +161,14 @@ export const CAMPUS_STAGES: Stage[] = [
     "positionId": 22,
     "floor": "Ground Floor",
     "category": "green_room",
-    "tags": ["green room", "makeup", "dressing", "costume", "artists", "zion"]
+    "tags": [
+      "green room",
+      "makeup",
+      "dressing",
+      "costume",
+      "artists",
+      "zion"
+    ]
   },
   {
     "stageNumber": -23,
@@ -169,7 +176,14 @@ export const CAMPUS_STAGES: Stage[] = [
     "positionId": 23,
     "floor": "Ground Floor",
     "category": "green_room",
-    "tags": ["green room", "makeup", "dressing", "costume", "artists", "divine"]
+    "tags": [
+      "green room",
+      "makeup",
+      "dressing",
+      "costume",
+      "artists",
+      "divine"
+    ]
   },
   {
     "stageNumber": 2,

@@ -42,9 +42,9 @@ import { useIsMobile } from './hooks/useIsMobile';
 import { Sparkles } from 'lucide-react';
 import { WelcomeScreen } from './components/WelcomeScreen';
 
-const ROAD_NETWORK_STORAGE_KEY = 'holly_grace_manual_road_network_v9';
-const CAMPUS_POSITIONS_STORAGE_KEY = 'holly_grace_campus_positions_v11';
-const CAMPUS_STAGES_STORAGE_KEY = 'holly_grace_campus_stages_v6';
+const ROAD_NETWORK_STORAGE_KEY = 'holly_grace_manual_road_network_v10';
+const CAMPUS_POSITIONS_STORAGE_KEY = 'holly_grace_campus_positions_v12';
+const CAMPUS_STAGES_STORAGE_KEY = 'holly_grace_campus_stages_v7';
 const CAMPUS_BOUNDARY_DATA_STORAGE_KEY = 'holly_grace_campus_boundary_data_v2';
 const CAMPUS_BOUNDARY_ENFORCED_STORAGE_KEY = 'holly_grace_boundary_enforced_v2';
 
@@ -60,6 +60,7 @@ export const App: React.FC = () => {
       localStorage.removeItem('holly_grace_manual_road_network_v6');
       localStorage.removeItem('holly_grace_manual_road_network_v7');
       localStorage.removeItem('holly_grace_manual_road_network_v8');
+      localStorage.removeItem('holly_grace_manual_road_network_v9');
       localStorage.removeItem('holly_grace_campus_positions');
       localStorage.removeItem('holly_grace_campus_positions_v2');
       localStorage.removeItem('holly_grace_campus_positions_v3');
@@ -70,11 +71,13 @@ export const App: React.FC = () => {
       localStorage.removeItem('holly_grace_campus_positions_v8');
       localStorage.removeItem('holly_grace_campus_positions_v9');
       localStorage.removeItem('holly_grace_campus_positions_v10');
+      localStorage.removeItem('holly_grace_campus_positions_v11');
       localStorage.removeItem('holly_grace_campus_stages');
       localStorage.removeItem('holly_grace_campus_stages_v2');
       localStorage.removeItem('holly_grace_campus_stages_v3');
       localStorage.removeItem('holly_grace_campus_stages_v4');
       localStorage.removeItem('holly_grace_campus_stages_v5');
+      localStorage.removeItem('holly_grace_campus_stages_v6');
       localStorage.removeItem('holly_grace_campus_boundary_data');
       localStorage.removeItem('holly_grace_boundary_enforced');
     } catch {}
