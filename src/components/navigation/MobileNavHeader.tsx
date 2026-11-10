@@ -16,6 +16,7 @@ interface MobileNavHeaderProps {
   isEditorOpen?: boolean;
   hasParentWebsite?: boolean;
   onBackToParent?: () => void;
+  onOpen360?: () => void;
 }
 
 /** Nearest named campus landmark to a tapped map point (no geocoding involved). */
@@ -49,6 +50,7 @@ export const MobileNavHeader: React.FC<MobileNavHeaderProps> = ({
   isEditorOpen = false,
   hasParentWebsite = false,
   onBackToParent,
+  onOpen360,
 }) => {
   const headerRef = useRef<HTMLDivElement | null>(null);
 
@@ -160,6 +162,31 @@ export const MobileNavHeader: React.FC<MobileNavHeaderProps> = ({
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 active:bg-slate-200"
           >
             <RotateCcw className="h-3.5 w-3.5" />
+          </button>
+        )}
+
+        {/* 360 Degree Map Button (Integrated in Top Bar) */}
+        {onOpen360 && (
+          <button
+            type="button"
+            onClick={onOpen360}
+            aria-label="360 Degree Map Virtual Tour"
+            title="Open 360° Campus Virtual Tour"
+            className="flex items-center gap-1 h-7 px-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-95 text-white font-extrabold text-[10px] shadow-sm transition-all shrink-0 cursor-pointer"
+          >
+            <svg
+              className="w-3.5 h-3.5 text-white"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21.5 12a9.5 9.5 0 1 1-2.5-6.3L21.5 8" />
+              <polyline points="21.5 3 21.5 8 16.5 8" />
+            </svg>
+            <span className="tracking-tight">360°</span>
           </button>
         )}
 

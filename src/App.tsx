@@ -38,7 +38,6 @@ import { DesktopNavPanel } from './components/navigation/DesktopNavPanel';
 import { MobileNavHeader } from './components/navigation/MobileNavHeader';
 import { MobileBottomSheet } from './components/navigation/MobileBottomSheet';
 import { DestinationSearchModal } from './components/navigation/DestinationSearchModal';
-import { Tour360Button } from './components/navigation/Tour360Button';
 import { useIsMobile } from './hooks/useIsMobile';
 import { Sparkles } from 'lucide-react';
 import { WelcomeScreen } from './components/WelcomeScreen';
@@ -1621,6 +1620,7 @@ export const App: React.FC = () => {
         onLogoClick={handleLogoClick}
         hasParentWebsite={hasParentWebsite}
         onBackToParent={handleBackToParent}
+        onOpen360={handleOpen360Tour}
       />
 
       {/* Mobile compact FROM | TO search card */}
@@ -1637,6 +1637,7 @@ export const App: React.FC = () => {
         isEditorOpen={isEditorOpen}
         hasParentWebsite={hasParentWebsite}
         onBackToParent={handleBackToParent}
+        onOpen360={handleOpen360Tour}
       />
 
       {/* Mobile contextual bottom drawer (only while a location is selected) */}
@@ -1659,16 +1660,6 @@ export const App: React.FC = () => {
         positions={positions}
         selectedStage={selectedStage}
       />
-
-      {/* 360 Degree Map Floating Action Button (Accessible on Mobile & Desktop) */}
-      {!isEditorOpen && (
-        <aside
-          aria-label="360 Degree Virtual Campus Tour"
-          className="fixed top-[58px] right-2.5 md:top-3.5 md:right-4 z-40 animate-fade-in pointer-events-auto"
-        >
-          <Tour360Button onOpen360={handleOpen360Tour} />
-        </aside>
-      )}
 
       {/* Developer Mode Toast Notification */}
       {devToast && (

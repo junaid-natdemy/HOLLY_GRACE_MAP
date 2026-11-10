@@ -38,6 +38,7 @@ interface DesktopNavPanelProps {
   onLogoClick?: () => void;
   hasParentWebsite?: boolean;
   onBackToParent?: () => void;
+  onOpen360?: () => void;
 }
 
 export const DesktopNavPanel: React.FC<DesktopNavPanelProps> = ({
@@ -62,6 +63,7 @@ export const DesktopNavPanel: React.FC<DesktopNavPanelProps> = ({
   onLogoClick,
   hasParentWebsite = false,
   onBackToParent,
+  onOpen360,
 }) => {
   const [isStartDropdownOpen, setIsStartDropdownOpen] = useState<boolean>(false);
   const [isInfoPanelOpen, setIsInfoPanelOpen] = useState<boolean>(true);
@@ -148,7 +150,7 @@ export const DesktopNavPanel: React.FC<DesktopNavPanelProps> = ({
 
   return (
     <>
-      <div className="hidden md:flex flex-col items-center fixed top-3.5 left-1/2 -translate-x-1/2 z-40 pointer-events-auto w-[min(440px,calc(100vw-32px))]">
+      <div className="hidden md:flex flex-col items-center fixed top-3.5 left-1/2 -translate-x-1/2 z-40 pointer-events-auto w-[min(490px,calc(100vw-32px))]">
         {/* 1. COMPACT FLOATING NAVBAR (Google Maps / Clean SaaS Style) */}
         <div className="w-full h-[38px] bg-white/95 backdrop-blur-xl rounded-[14px] shadow-[0_8px_30px_-6px_rgba(15,23,42,0.12)] border border-slate-200/80 px-1.5 py-1 flex items-center gap-1 transition-all select-none">
           
@@ -363,6 +365,30 @@ export const DesktopNavPanel: React.FC<DesktopNavPanelProps> = ({
             <Navigation className="w-2 h-2 fill-current rotate-45" />
             <span>{route ? 'Recalculate' : 'Directions'}</span>
           </button>
+
+          {/* 360° Virtual Tour Button */}
+          {onOpen360 && (
+            <button
+              type="button"
+              onClick={onOpen360}
+              className="h-7 px-2 rounded-md bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold text-[9px] flex items-center gap-1 transition-all shrink-0 cursor-pointer shadow-2xs"
+              title="Open 360° Campus Virtual Tour"
+            >
+              <svg
+                className="w-3 h-3 text-white"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21.5 12a9.5 9.5 0 1 1-2.5-6.3L21.5 8" />
+                <polyline points="21.5 3 21.5 8 16.5 8" />
+              </svg>
+              <span>360° Map</span>
+            </button>
+          )}
 
           {/* Clear Route Button (If active) */}
           {route && (
