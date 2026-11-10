@@ -42,9 +42,9 @@ import { useIsMobile } from './hooks/useIsMobile';
 import { Sparkles } from 'lucide-react';
 import { WelcomeScreen } from './components/WelcomeScreen';
 
-const ROAD_NETWORK_STORAGE_KEY = 'holly_grace_manual_road_network_v7';
-const CAMPUS_POSITIONS_STORAGE_KEY = 'holly_grace_campus_positions_v8';
-const CAMPUS_STAGES_STORAGE_KEY = 'holly_grace_campus_stages_v4';
+const ROAD_NETWORK_STORAGE_KEY = 'holly_grace_manual_road_network_v9';
+const CAMPUS_POSITIONS_STORAGE_KEY = 'holly_grace_campus_positions_v10';
+const CAMPUS_STAGES_STORAGE_KEY = 'holly_grace_campus_stages_v5';
 const CAMPUS_BOUNDARY_DATA_STORAGE_KEY = 'holly_grace_campus_boundary_data_v2';
 const CAMPUS_BOUNDARY_ENFORCED_STORAGE_KEY = 'holly_grace_boundary_enforced_v2';
 
@@ -57,14 +57,22 @@ export const App: React.FC = () => {
       localStorage.removeItem('holly_grace_manual_road_network_v3');
       localStorage.removeItem('holly_grace_manual_road_network_v4');
       localStorage.removeItem('holly_grace_manual_road_network_v5');
+      localStorage.removeItem('holly_grace_manual_road_network_v6');
+      localStorage.removeItem('holly_grace_manual_road_network_v7');
+      localStorage.removeItem('holly_grace_manual_road_network_v8');
       localStorage.removeItem('holly_grace_campus_positions');
       localStorage.removeItem('holly_grace_campus_positions_v2');
       localStorage.removeItem('holly_grace_campus_positions_v3');
       localStorage.removeItem('holly_grace_campus_positions_v4');
       localStorage.removeItem('holly_grace_campus_positions_v5');
       localStorage.removeItem('holly_grace_campus_positions_v6');
+      localStorage.removeItem('holly_grace_campus_positions_v7');
+      localStorage.removeItem('holly_grace_campus_positions_v8');
+      localStorage.removeItem('holly_grace_campus_positions_v9');
       localStorage.removeItem('holly_grace_campus_stages');
       localStorage.removeItem('holly_grace_campus_stages_v2');
+      localStorage.removeItem('holly_grace_campus_stages_v3');
+      localStorage.removeItem('holly_grace_campus_stages_v4');
       localStorage.removeItem('holly_grace_campus_boundary_data');
       localStorage.removeItem('holly_grace_boundary_enforced');
     } catch {}
@@ -188,6 +196,9 @@ export const App: React.FC = () => {
   // 8b. Mobile reset signal: returns the map to its initial pan/zoom
   const [mapResetSignal, setMapResetSignal] = useState<number>(0);
 
+  // Default Parent Portal Website URL
+  const DEFAULT_PARENT_URL = 'https://sahodaya.holygraceacademy.com/index.html';
+
   // 9. Developer / Admin Mode State (Disabled by default for production)
   const [isDevMode, setIsDevMode] = useState<boolean>(() => {
     try {
@@ -200,8 +211,8 @@ export const App: React.FC = () => {
   const [isEditorOpen, setIsEditorOpen] = useState<boolean>(false);
   const [devToast, setDevToast] = useState<string | null>(null);
 
-  // Parent Website Return URL & History (for linking from Web A to Map and going back)
-  const [parentReturnUrl] = useState<string | null>(() => {
+  // Parent Website Return URL & History (for linking from Sahodaya portal to Map and going back)
+  const [parentReturnUrl] = useState<string>(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       const urlParam = params.get('returnUrl') || params.get('from') || params.get('ref');
@@ -217,41 +228,41 @@ export const App: React.FC = () => {
         return document.referrer;
       }
     } catch {}
-    return null;
+    return DEFAULT_PARENT_URL;
   });
 
   const handleBackToParent = useCallback(() => {
-    const returnUrl = parentReturnUrl || (typeof document !== 'undefined' ? document.referrer : null);
+    const returnUrl = parentReturnUrl || DEFAULT_PARENT_URL;
     if (window.history.length > 1 && document.referrer && !document.referrer.includes(window.location.host)) {
       window.history.back();
     } else if (returnUrl && !returnUrl.includes(window.location.host)) {
       window.location.href = returnUrl;
-    } else if (window.history.length > 1) {
-      window.history.back();
-    } else if (returnUrl) {
-      window.location.href = returnUrl;
+    } else {
+      window.location.href = DEFAULT_PARENT_URL;
     }
   }, [parentReturnUrl]);
 
-  const hasParentWebsite = Boolean(
-    parentReturnUrl ||
-    (typeof document !== 'undefined' && document.referrer && !document.referrer.includes(window.location.host)) ||
-    (typeof window !== 'undefined' && window.history.length > 1)
-  );
+  // Always show back button so users can seamlessly return to Sahodaya website
+  const hasParentWebsite = true;
 
-  // Close search modal on browser/phone back gesture if open
+  // Intercept browser hardware back or mobile swipe-back gestures to return to Sahodaya parent website
   useEffect(() => {
-    if (isSearchModalOpen) {
-      window.history.pushState({ modal: 'search' }, '');
-      const handlePopState = () => {
+    window.history.pushState({ page: 'campus_map' }, '');
+
+    const handlePopState = () => {
+      if (isSearchModalOpen) {
         setIsSearchModalOpen(false);
-      };
-      window.addEventListener('popstate', handlePopState, { once: true });
-      return () => {
-        window.removeEventListener('popstate', handlePopState);
-      };
-    }
-  }, [isSearchModalOpen]);
+        return;
+      }
+      const target = parentReturnUrl || DEFAULT_PARENT_URL;
+      window.location.href = target;
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [parentReturnUrl, isSearchModalOpen]);
 
   // Secret Logo Multi-click unlock for testing & authorized admins
   const logoClickCountRef = useRef<number>(0);
@@ -1479,6 +1490,36 @@ export const App: React.FC = () => {
     : null;
 
   const [mapImageReady, setMapImageReady] = useState(false);
+
+  // High performance HD map image preload & decode into GPU memory before splash screen dismisses
+  useEffect(() => {
+    let active = true;
+    const img = new Image();
+    img.src = '/campus-map-new.webp';
+    const onDecoded = () => {
+      if (active) setMapImageReady(true);
+    };
+
+    if (img.decode) {
+      img.decode().then(onDecoded).catch(() => {
+        const fallback = new Image();
+        fallback.src = '/campus-map-new.png';
+        if (fallback.decode) {
+          fallback.decode().then(onDecoded).catch(onDecoded);
+        } else {
+          fallback.onload = onDecoded;
+          fallback.onerror = onDecoded;
+        }
+      });
+    } else {
+      img.onload = onDecoded;
+      img.onerror = onDecoded;
+    }
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[#7d9a62] font-sans text-slate-800">

@@ -8,12 +8,12 @@ export const CAMPUS_POSITIONS: CampusPosition[] = [
     "name": "Ephatha Block",
     "description": "",
     "pixelCoord": {
-      "x": 497,
-      "y": 661
+      "x": 502,
+      "y": 662
     },
     "normalizedCoord": {
-      "x": 0.4409937888198758,
-      "y": 0.47349570200573066
+      "x": 0.4454303460514641,
+      "y": 0.47421203438395415
     },
     "roadNetworkNodeId": "node_53skt",
     "category": "academic"
@@ -368,12 +368,12 @@ export const CAMPUS_POSITIONS: CampusPosition[] = [
     "name": "Ecce Block",
     "description": "",
     "pixelCoord": {
-      "x": 531,
-      "y": 775
+      "x": 525,
+      "y": 781
     },
     "normalizedCoord": {
-      "x": 0.47116237799467614,
-      "y": 0.5551575931232091
+      "x": 0.4658385093167702,
+      "y": 0.5594555873925502
     },
     "roadNetworkNodeId": "node_53skt",
     "category": "academic"

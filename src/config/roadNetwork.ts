@@ -7,7 +7,7 @@ import {
 
 /**
  * CAMPUS ROAD NETWORK
- * Verified full campus road network with 229 nodes, 228 edges, and 29 access points.
+ * Verified full campus road network with 233 nodes, 231 edges, and 29 access points.
  */
 export const VERIFIED_MANUAL_ROAD_DATA: RoadNetworkData = {
   "nodes": {
@@ -131,18 +131,6 @@ export const VERIFIED_MANUAL_ROAD_DATA: RoadNetworkData = {
       },
       "isEntrance": false
     },
-    "node_jr63t": {
-      "id": "node_jr63t",
-      "pixelCoord": {
-        "x": 477.2,
-        "y": 737.3
-      },
-      "normalizedCoord": {
-        "x": 0.42342502218278616,
-        "y": 0.5281518624641833
-      },
-      "isEntrance": false
-    },
     "node_kwktt": {
       "id": "node_kwktt",
       "pixelCoord": {
@@ -218,12 +206,12 @@ export const VERIFIED_MANUAL_ROAD_DATA: RoadNetworkData = {
     "node_kwzc3": {
       "id": "node_kwzc3",
       "pixelCoord": {
-        "x": 415.5,
-        "y": 581.7
+        "x": 409,
+        "y": 580
       },
       "normalizedCoord": {
-        "x": 0.3686779059449867,
-        "y": 0.4166905444126075
+        "x": 0.3629103815439219,
+        "y": 0.4154727793696275
       },
       "isEntrance": false
     },
@@ -2696,6 +2684,61 @@ export const VERIFIED_MANUAL_ROAD_DATA: RoadNetworkData = {
         "x": 0.47098491570541257,
         "y": 0.3505730659025788
       }
+    },
+    "node_aawh1": {
+      "id": "node_aawh1",
+      "pixelCoord": {
+        "x": 500.4,
+        "y": 735.6
+      },
+      "normalizedCoord": {
+        "x": 0.44401064773735577,
+        "y": 0.5269340974212035
+      }
+    },
+    "node_aaxvi": {
+      "id": "node_aaxvi",
+      "pixelCoord": {
+        "x": 481,
+        "y": 737.2
+      },
+      "normalizedCoord": {
+        "x": 0.42679680567879325,
+        "y": 0.5280802292263611
+      }
+    },
+    "node_adchb": {
+      "id": "node_adchb",
+      "pixelCoord": {
+        "x": 562,
+        "y": 718.9
+      },
+      "normalizedCoord": {
+        "x": 0.4986690328305235,
+        "y": 0.514971346704871
+      }
+    },
+    "node_aekqi": {
+      "id": "node_aekqi",
+      "pixelCoord": {
+        "x": 496.2,
+        "y": 755.3
+      },
+      "normalizedCoord": {
+        "x": 0.44028393966282164,
+        "y": 0.5410458452722062
+      }
+    },
+    "node_aeo81": {
+      "id": "node_aeo81",
+      "pixelCoord": {
+        "x": 498.2,
+        "y": 778.1
+      },
+      "normalizedCoord": {
+        "x": 0.44205856255545695,
+        "y": 0.557378223495702
+      }
     }
   },
   "edges": [
@@ -2738,11 +2781,6 @@ export const VERIFIED_MANUAL_ROAD_DATA: RoadNetworkData = {
       "from": "node_jr1n5",
       "to": "node_jr441",
       "distancePx": 18
-    },
-    {
-      "from": "node_jr441",
-      "to": "node_jr63t",
-      "distancePx": 17
     },
     {
       "from": "node_jo4t4",
@@ -3838,42 +3876,62 @@ export const VERIFIED_MANUAL_ROAD_DATA: RoadNetworkData = {
       "from": "node_l4djr",
       "to": "node_79nc2",
       "distancePx": 44
+    },
+    {
+      "from": "node_aawh1",
+      "to": "node_aaxvi",
+      "distancePx": 19
+    },
+    {
+      "from": "node_jr441",
+      "to": "node_aaxvi",
+      "distancePx": 20
+    },
+    {
+      "from": "node_aekqi",
+      "to": "node_aeo81",
+      "distancePx": 23
+    },
+    {
+      "from": "node_aaxvi",
+      "to": "node_aekqi",
+      "distancePx": 24
     }
   ],
   "accessPoints": {
     "1": {
       "positionId": 1,
       "pixelCoord": {
-        "x": 492.8,
-        "y": 737
+        "x": 507,
+        "y": 676
       },
       "normalizedCoord": {
-        "x": 0.43726708074534165,
-        "y": 0.5279369627507163
+        "x": 0.44986690328305234,
+        "y": 0.48424068767908307
       },
-      "connectedRoadNodeId": "node_jr63t"
+      "connectedRoadNodeId": "node_aawh1"
     },
     "2": {
       "positionId": 2,
       "pixelCoord": {
-        "x": 437.2,
-        "y": 872.5
+        "x": 423.7,
+        "y": 873.5
       },
       "normalizedCoord": {
-        "x": 0.38793256433007983,
-        "y": 0.625
+        "x": 0.37595385980479146,
+        "y": 0.6257163323782235
       },
       "connectedRoadNodeId": "node_jo778"
     },
     "3": {
       "positionId": 3,
       "pixelCoord": {
-        "x": 378.1,
-        "y": 579.6
+        "x": 367,
+        "y": 568
       },
       "normalizedCoord": {
-        "x": 0.3354924578527063,
-        "y": 0.4151862464183381
+        "x": 0.3256433007985803,
+        "y": 0.4068767908309456
       },
       "connectedRoadNodeId": "node_kwzc3"
     },
@@ -3916,14 +3974,14 @@ export const VERIFIED_MANUAL_ROAD_DATA: RoadNetworkData = {
     "7": {
       "positionId": 7,
       "pixelCoord": {
-        "x": 553.8,
-        "y": 729.9
+        "x": 563,
+        "y": 720
       },
       "normalizedCoord": {
-        "x": 0.49139307897071866,
-        "y": 0.5228510028653295
+        "x": 0.49955634427684115,
+        "y": 0.5157593123209169
       },
-      "connectedRoadNodeId": "node_jr63t"
+      "connectedRoadNodeId": "node_aawh1"
     },
     "8": {
       "positionId": 8,
@@ -4072,12 +4130,12 @@ export const VERIFIED_MANUAL_ROAD_DATA: RoadNetworkData = {
     "20": {
       "positionId": 20,
       "pixelCoord": {
-        "x": 408,
-        "y": 394.4
+        "x": 425,
+        "y": 390
       },
       "normalizedCoord": {
-        "x": 0.36202307009760426,
-        "y": 0.2825214899713467
+        "x": 0.37710736468500444,
+        "y": 0.2793696275071633
       },
       "connectedRoadNodeId": "node_llcr0"
     },
@@ -4096,50 +4154,50 @@ export const VERIFIED_MANUAL_ROAD_DATA: RoadNetworkData = {
     "22": {
       "positionId": 22,
       "pixelCoord": {
-        "x": 633.7,
-        "y": 644.6
+        "x": 642.9,
+        "y": 643
       },
       "normalizedCoord": {
-        "x": 0.5622892635314996,
-        "y": 0.46174785100286536
+        "x": 0.570452528837622,
+        "y": 0.46060171919770776
       },
       "connectedRoadNodeId": "node_l8ii7"
     },
     "23": {
       "positionId": 23,
       "pixelCoord": {
-        "x": 505.6,
-        "y": 734.7
+        "x": 530,
+        "y": 688
       },
       "normalizedCoord": {
-        "x": 0.44862466725820765,
-        "y": 0.5262893982808023
+        "x": 0.4702750665483585,
+        "y": 0.49283667621776506
       },
-      "connectedRoadNodeId": "node_jr63t"
+      "connectedRoadNodeId": "node_aawh1"
     },
     "24": {
       "positionId": 24,
       "pixelCoord": {
-        "x": 519.4,
-        "y": 731.5
+        "x": 491,
+        "y": 698
       },
       "normalizedCoord": {
-        "x": 0.4608695652173913,
-        "y": 0.5239971346704871
+        "x": 0.4356699201419698,
+        "y": 0.5
       },
-      "connectedRoadNodeId": "node_jr63t"
+      "connectedRoadNodeId": "node_aawh1"
     },
     "25": {
       "positionId": 25,
       "pixelCoord": {
-        "x": 501.4,
-        "y": 777.6
+        "x": 525,
+        "y": 780
       },
       "normalizedCoord": {
-        "x": 0.4448979591836735,
-        "y": 0.5570200573065903
+        "x": 0.4658385093167702,
+        "y": 0.5587392550143266
       },
-      "connectedRoadNodeId": "node_jr63t"
+      "connectedRoadNodeId": "node_aeo81"
     },
     "26": {
       "positionId": 26,
@@ -4180,7 +4238,7 @@ export const VERIFIED_MANUAL_ROAD_DATA: RoadNetworkData = {
     "29": {
       "positionId": 29,
       "pixelCoord": {
-        "x": 927.0,
+        "x": 927,
         "y": 741.6
       },
       "normalizedCoord": {
