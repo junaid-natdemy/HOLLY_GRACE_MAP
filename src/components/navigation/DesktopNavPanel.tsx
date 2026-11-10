@@ -41,7 +41,7 @@ interface DesktopNavPanelProps {
 }
 
 export const DesktopNavPanel: React.FC<DesktopNavPanelProps> = ({
-  startPoint,
+  startPoint: _startPoint,
   isCustomStart,
   onResetStartToEntrance,
   selectedStage,
@@ -188,11 +188,11 @@ export const DesktopNavPanel: React.FC<DesktopNavPanelProps> = ({
               {/* Labels */}
               <div className="min-w-0 flex-1">
                 <div className="text-[7.5px] font-bold text-slate-400 uppercase tracking-wider leading-none">
-                  Start
+                  From (You)
                 </div>
                 <div className="text-[9px] font-bold text-slate-800 truncate leading-snug mt-0.5">
                   {isCustomStart
-                    ? `Point (${Math.round(startPoint.x)}, ${Math.round(startPoint.y)})`
+                    ? 'Your Location'
                     : 'South Entrance'}
                 </div>
               </div>
@@ -233,7 +233,7 @@ export const DesktopNavPanel: React.FC<DesktopNavPanelProps> = ({
                 {isCustomStart && (
                   <div className="p-1.5 rounded-lg bg-slate-50 text-slate-600 flex items-center justify-between text-xs">
                     <span className="truncate">
-                      Point ({Math.round(startPoint.x)}, {Math.round(startPoint.y)})
+                      Your Location (Map Pin)
                     </span>
                     <button
                       type="button"

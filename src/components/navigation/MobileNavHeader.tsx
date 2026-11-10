@@ -33,7 +33,7 @@ function getStartLabel(startPoint: PixelPoint, isCustomStart: boolean, positions
   }
 
   if (nearest) return `Near ${formatBuildingDisplayName(nearest.name)}`;
-  return 'Custom pin';
+  return 'Your Location';
 }
 
 export const MobileNavHeader: React.FC<MobileNavHeaderProps> = ({
