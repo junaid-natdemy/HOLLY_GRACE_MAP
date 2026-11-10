@@ -3,6 +3,7 @@ import { NormalizedPoint, PixelPoint } from '../types/campus';
 export interface MapConfig {
   imageUrl: string;
   webpUrl?: string;
+  hdWebpUrl?: string;
   nativeWidth: number;
   nativeHeight: number;
   aspectRatio: number;
@@ -17,6 +18,7 @@ export const MAP_CONFIG: MapConfig = {
   // Updated with new campus photograph (1127x1396)
   imageUrl: '/campus-map-new.png',
   webpUrl: '/campus-map-new.webp',
+  hdWebpUrl: '/campus-map-hd.webp',
   nativeWidth: 1127,
   nativeHeight: 1396,
   aspectRatio: 1127 / 1396, // ~0.8073

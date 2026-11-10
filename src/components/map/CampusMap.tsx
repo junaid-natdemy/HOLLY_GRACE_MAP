@@ -260,8 +260,6 @@ export const CampusMap: React.FC<CampusMapProps> = ({
           height: `${stageHeight}px`,
           transform: `translate3d(calc(-50% + ${pan.x}px), calc(-50% + ${pan.y}px), 0) scale(${zoom})`,
           transition: isDragging ? 'none' : 'transform 0.08s cubic-bezier(0.16, 1, 0.3, 1)',
-          backfaceVisibility: 'hidden',
-          WebkitBackfaceVisibility: 'hidden',
         }}
       >
         {/* Raster drone aerial background */}

@@ -11,9 +11,14 @@ export const MapImage: React.FC<MapImageProps> = ({ onLoad }) => {
   return (
     <div className="relative w-full h-full select-none pointer-events-none">
       <picture className="w-full h-full block">
-        {MAP_CONFIG.webpUrl && (
+        {MAP_CONFIG.hdWebpUrl ? (
+          <source
+            type="image/webp"
+            srcSet={`${MAP_CONFIG.hdWebpUrl} 2x, ${MAP_CONFIG.webpUrl || MAP_CONFIG.imageUrl} 1x`}
+          />
+        ) : MAP_CONFIG.webpUrl ? (
           <source type="image/webp" srcSet={MAP_CONFIG.webpUrl} />
-        )}
+        ) : null}
         <img
           ref={(node) => {
             if (node?.complete && node.naturalWidth > 0) {
@@ -24,15 +29,18 @@ export const MapImage: React.FC<MapImageProps> = ({ onLoad }) => {
               }
             }
           }}
-          src={MAP_CONFIG.imageUrl}
+          src={MAP_CONFIG.webpUrl || MAP_CONFIG.imageUrl}
+          srcSet={
+            MAP_CONFIG.hdWebpUrl
+              ? `${MAP_CONFIG.hdWebpUrl} 2x, ${MAP_CONFIG.webpUrl || MAP_CONFIG.imageUrl} 1x`
+              : undefined
+          }
           alt="Holly Grace Campus Map"
           width={MAP_CONFIG.nativeWidth}
           height={MAP_CONFIG.nativeHeight}
           className="w-full h-full block select-none pointer-events-none"
           style={{
-            imageRendering: '-webkit-optimize-contrast',
-            backfaceVisibility: 'hidden',
-            WebkitBackfaceVisibility: 'hidden',
+            imageRendering: 'auto',
           }}
           draggable={false}
           decoding="async"

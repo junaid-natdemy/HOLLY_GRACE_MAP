@@ -1515,7 +1515,8 @@ export const App: React.FC = () => {
   useEffect(() => {
     let active = true;
     const img = new Image();
-    img.src = '/campus-map-new.webp';
+    const isRetina = typeof window !== 'undefined' && window.devicePixelRatio > 1;
+    img.src = isRetina ? '/campus-map-hd.webp' : '/campus-map-new.webp';
     const onDecoded = () => {
       if (active) setMapImageReady(true);
     };
@@ -1523,7 +1524,7 @@ export const App: React.FC = () => {
     if (img.decode) {
       img.decode().then(onDecoded).catch(() => {
         const fallback = new Image();
-        fallback.src = '/campus-map-new.png';
+        fallback.src = isRetina ? '/campus-map-new.webp' : '/campus-map-new.png';
         if (fallback.decode) {
           fallback.decode().then(onDecoded).catch(onDecoded);
         } else {
