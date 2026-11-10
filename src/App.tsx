@@ -38,6 +38,7 @@ import { DesktopNavPanel } from './components/navigation/DesktopNavPanel';
 import { MobileNavHeader } from './components/navigation/MobileNavHeader';
 import { MobileBottomSheet } from './components/navigation/MobileBottomSheet';
 import { DestinationSearchModal } from './components/navigation/DestinationSearchModal';
+import { Tour360Button } from './components/navigation/Tour360Button';
 import { useIsMobile } from './hooks/useIsMobile';
 import { Sparkles } from 'lucide-react';
 import { WelcomeScreen } from './components/WelcomeScreen';
@@ -228,13 +229,28 @@ export const App: React.FC = () => {
       const saved = sessionStorage.getItem('campus_parent_return_url');
       if (saved) return saved;
 
-      if (document.referrer && !document.referrer.includes(window.location.host)) {
+      if (
+        document.referrer &&
+        !document.referrer.includes(window.location.host) &&
+        !document.referrer.includes('360-degree-holy-grace')
+      ) {
         sessionStorage.setItem('campus_parent_return_url', document.referrer);
         return document.referrer;
       }
     } catch {}
     return DEFAULT_PARENT_URL;
   });
+
+  // 360 Degree Map Virtual Tour URL & Navigation
+  const TOUR_360_URL = 'https://360-degree-holy-grace.vercel.app/';
+
+  const handleOpen360Tour = useCallback(() => {
+    try {
+      sessionStorage.setItem('campus_last_active_map_url', window.location.href);
+    } catch {}
+    const returnUrl = encodeURIComponent(window.location.href);
+    window.location.href = `${TOUR_360_URL}?returnUrl=${returnUrl}`;
+  }, []);
 
   const handleBackToParent = useCallback(() => {
     const returnUrl = parentReturnUrl || DEFAULT_PARENT_URL;
@@ -1643,6 +1659,16 @@ export const App: React.FC = () => {
         positions={positions}
         selectedStage={selectedStage}
       />
+
+      {/* 360 Degree Map Floating Action Button (Accessible on Mobile & Desktop) */}
+      {!isEditorOpen && (
+        <aside
+          aria-label="360 Degree Virtual Campus Tour"
+          className="fixed top-[58px] right-2.5 md:top-3.5 md:right-4 z-40 animate-fade-in pointer-events-auto"
+        >
+          <Tour360Button onOpen360={handleOpen360Tour} />
+        </aside>
+      )}
 
       {/* Developer Mode Toast Notification */}
       {devToast && (
