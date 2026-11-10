@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import {
+  CAMPUS_POSITIONS,
   getDefaultCampusPositions,
   getPositionById,
   formatBuildingDisplayName,
@@ -9,13 +10,15 @@ import {
   buildRoadGraphFromData,
   getDefaultRoadNetworkData,
   getEntranceNode,
+  VERIFIED_MANUAL_ROAD_DATA,
 } from './config/roadNetwork';
 import {
   autoConnectPerimeterEdges,
   extractPolygonFromBoundaryData,
   getDefaultBoundaryData,
 } from './config/campusBoundary';
-import { getStagesByPositionId, getDefaultCampusStages } from './config/stageMapping';
+import { MAP_CONFIG, pixelToNormalized } from './config/mapConfig';
+import { CAMPUS_STAGES, getStagesByPositionId, getDefaultCampusStages } from './config/stageMapping';
 import { calculateRoute, findNearestNode } from './services/routingService';
 import {
   BoundaryData,
@@ -39,92 +42,78 @@ import { useIsMobile } from './hooks/useIsMobile';
 import { Sparkles } from 'lucide-react';
 import { WelcomeScreen } from './components/WelcomeScreen';
 
-const ROAD_NETWORK_STORAGE_KEY = 'holly_grace_manual_road_network';
-const CAMPUS_POSITIONS_STORAGE_KEY = 'holly_grace_campus_positions';
-const CAMPUS_STAGES_STORAGE_KEY = 'holly_grace_campus_stages';
-const CAMPUS_BOUNDARY_DATA_STORAGE_KEY = 'holly_grace_campus_boundary_data';
-const CAMPUS_BOUNDARY_ENFORCED_STORAGE_KEY = 'holly_grace_boundary_enforced';
+const ROAD_NETWORK_STORAGE_KEY = 'holly_grace_manual_road_network_v7';
+const CAMPUS_POSITIONS_STORAGE_KEY = 'holly_grace_campus_positions_v8';
+const CAMPUS_STAGES_STORAGE_KEY = 'holly_grace_campus_stages_v4';
+const CAMPUS_BOUNDARY_DATA_STORAGE_KEY = 'holly_grace_campus_boundary_data_v2';
+const CAMPUS_BOUNDARY_ENFORCED_STORAGE_KEY = 'holly_grace_boundary_enforced_v2';
 
 export const App: React.FC = () => {
-  // 1. Campus Positions State (Loaded from storage or baseline)
+  // Clear any legacy keys from previous map
+  useEffect(() => {
+    try {
+      localStorage.removeItem('holly_grace_manual_road_network');
+      localStorage.removeItem('holly_grace_manual_road_network_v2');
+      localStorage.removeItem('holly_grace_manual_road_network_v3');
+      localStorage.removeItem('holly_grace_manual_road_network_v4');
+      localStorage.removeItem('holly_grace_manual_road_network_v5');
+      localStorage.removeItem('holly_grace_campus_positions');
+      localStorage.removeItem('holly_grace_campus_positions_v2');
+      localStorage.removeItem('holly_grace_campus_positions_v3');
+      localStorage.removeItem('holly_grace_campus_positions_v4');
+      localStorage.removeItem('holly_grace_campus_positions_v5');
+      localStorage.removeItem('holly_grace_campus_positions_v6');
+      localStorage.removeItem('holly_grace_campus_stages');
+      localStorage.removeItem('holly_grace_campus_stages_v2');
+      localStorage.removeItem('holly_grace_campus_boundary_data');
+      localStorage.removeItem('holly_grace_boundary_enforced');
+    } catch {}
+  }, []);
+
+  // 1. Campus Positions State (Fresh start for new map)
   const [positions, setPositions] = useState<CampusPosition[]>(() => {
     try {
       const saved = localStorage.getItem(CAMPUS_POSITIONS_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        const baseline = getDefaultCampusPositions();
-        if (Array.isArray(parsed) && parsed.length >= baseline.length) {
-          return parsed.map((p: CampusPosition) => {
-            const savedName = formatBuildingDisplayName(p.name);
-            const official = baseline.find((item) => item.id === p.id);
-            const officialName = official ? formatBuildingDisplayName(official.name) : savedName;
-            // Keep a longer official name when an older save only stored the short title.
-            const name =
-              officialName.includes('·') && !savedName.includes('·') ? officialName : savedName;
-            return { ...p, name };
-          });
-        }
+        if (Array.isArray(parsed) && parsed.length >= CAMPUS_POSITIONS.length) return parsed;
       }
-    } catch {
-      // ignore
-    }
+    } catch {}
     return getDefaultCampusPositions();
   });
   const [targetMovePositionId, setTargetMovePositionId] = useState<number | null>(null);
   const [pendingAddBuildingName, setPendingAddBuildingName] = useState<string | null>(null);
 
-  // Stages & Floors State (Loaded from storage or baseline)
+  // Stages & Floors State
   const [stages, setStages] = useState<Stage[]>(() => {
     try {
       const saved = localStorage.getItem(CAMPUS_STAGES_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        const baseline = getDefaultCampusStages();
-        if (Array.isArray(parsed) && parsed.length >= baseline.length) {
-          // VIP Parking is a named place only, never a numbered stage.
-          const next = parsed.filter((stage: Stage) => stage.positionId !== 10);
-          const officialStage15 = baseline.find((stage) => stage.stageNumber === 15);
-          if (officialStage15) {
-            const index = next.findIndex((stage: Stage) => stage.stageNumber === 15);
-            if (index === -1) next.push(officialStage15);
-            else next[index] = officialStage15;
-          }
-          return next;
-        }
+        if (Array.isArray(parsed) && parsed.length >= CAMPUS_STAGES.length) return parsed;
       }
-    } catch {
-      // ignore
-    }
+    } catch {}
     return getDefaultCampusStages();
   });
 
-  // 2. Road Network Data (Loaded from storage or baseline default)
+  // 2. Road Network Data
   const [roadData, setRoadData] = useState<RoadNetworkData>(() => {
     try {
       const saved = localStorage.getItem(ROAD_NETWORK_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.nodes && parsed.edges) {
-          const baseline = getDefaultRoadNetworkData();
-          // Automatically upgrade if stored network has fewer nodes than our verified baseline
-          if (Object.keys(parsed.nodes).length < Object.keys(baseline.nodes).length) {
-            try {
-              localStorage.setItem(ROAD_NETWORK_STORAGE_KEY, JSON.stringify(baseline));
-            } catch {
-              // ignore
-            }
-            return baseline;
-          }
-          const mergedAccessPoints = { ...baseline.accessPoints, ...(parsed.accessPoints || {}) };
+        if (parsed && typeof parsed === 'object') {
           return {
-            ...parsed,
-            accessPoints: mergedAccessPoints,
+            nodes: parsed.nodes || {},
+            edges: parsed.edges || [],
+            accessPoints: {
+              ...VERIFIED_MANUAL_ROAD_DATA.accessPoints,
+              ...(parsed.accessPoints || {}),
+            },
           };
         }
       }
-    } catch {
-      // ignore
-    }
+    } catch {}
     return getDefaultRoadNetworkData();
   });
 
@@ -134,23 +123,20 @@ export const App: React.FC = () => {
       const saved = localStorage.getItem(CAMPUS_BOUNDARY_DATA_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        const baseline = getDefaultBoundaryData();
-        if (parsed.nodes && parsed.edges && Object.keys(parsed.nodes).length >= Object.keys(baseline.nodes).length) {
+        if (parsed && parsed.nodes) {
           return parsed;
         }
       }
-    } catch {
-      // ignore
-    }
+    } catch {}
     return getDefaultBoundaryData();
   });
 
   const [isBoundaryEnforced, setIsBoundaryEnforced] = useState<boolean>(() => {
     try {
       const saved = localStorage.getItem(CAMPUS_BOUNDARY_ENFORCED_STORAGE_KEY);
-      return saved !== null ? JSON.parse(saved) : true;
+      return saved !== null ? JSON.parse(saved) : false;
     } catch {
-      return true;
+      return false;
     }
   });
 
@@ -171,8 +157,13 @@ export const App: React.FC = () => {
   }, [roadData.nodes]);
 
   const defaultStartPoint: PixelPoint = useMemo(() => {
-    return entranceNode ? entranceNode.pixelCoord : { x: 656, y: 719 };
-  }, [entranceNode]);
+    if (entranceNode) return entranceNode.pixelCoord;
+    const mainEntrancePos = positions.find(
+      (p) => p.id === 8 || p.name.toLowerCase().includes('main enterance')
+    );
+    if (mainEntrancePos) return mainEntrancePos.pixelCoord;
+    return { x: Math.round(MAP_CONFIG.nativeWidth / 2), y: Math.round(MAP_CONFIG.nativeHeight / 2) };
+  }, [entranceNode, positions]);
 
   // 4. User Starting Location State (Purely image coordinate)
   const [startPoint, setStartPoint] = useState<PixelPoint>(defaultStartPoint);
@@ -197,15 +188,70 @@ export const App: React.FC = () => {
   // 8b. Mobile reset signal: returns the map to its initial pan/zoom
   const [mapResetSignal, setMapResetSignal] = useState<number>(0);
 
-  // 9. Developer / Admin Mode State (Hidden from normal visitors)
+  // 9. Developer / Admin Mode State (Disabled by default for production)
   const [isDevMode, setIsDevMode] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    const search = window.location.search.toLowerCase();
-    const hash = window.location.hash.toLowerCase();
-    return search.includes('dev=true') || search.includes('admin=true') || hash === '#dev';
+    try {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('dev') === 'true';
+    } catch {
+      return false;
+    }
   });
   const [isEditorOpen, setIsEditorOpen] = useState<boolean>(false);
   const [devToast, setDevToast] = useState<string | null>(null);
+
+  // Parent Website Return URL & History (for linking from Web A to Map and going back)
+  const [parentReturnUrl] = useState<string | null>(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlParam = params.get('returnUrl') || params.get('from') || params.get('ref');
+      if (urlParam) {
+        sessionStorage.setItem('campus_parent_return_url', urlParam);
+        return urlParam;
+      }
+      const saved = sessionStorage.getItem('campus_parent_return_url');
+      if (saved) return saved;
+
+      if (document.referrer && !document.referrer.includes(window.location.host)) {
+        sessionStorage.setItem('campus_parent_return_url', document.referrer);
+        return document.referrer;
+      }
+    } catch {}
+    return null;
+  });
+
+  const handleBackToParent = useCallback(() => {
+    const returnUrl = parentReturnUrl || (typeof document !== 'undefined' ? document.referrer : null);
+    if (window.history.length > 1 && document.referrer && !document.referrer.includes(window.location.host)) {
+      window.history.back();
+    } else if (returnUrl && !returnUrl.includes(window.location.host)) {
+      window.location.href = returnUrl;
+    } else if (window.history.length > 1) {
+      window.history.back();
+    } else if (returnUrl) {
+      window.location.href = returnUrl;
+    }
+  }, [parentReturnUrl]);
+
+  const hasParentWebsite = Boolean(
+    parentReturnUrl ||
+    (typeof document !== 'undefined' && document.referrer && !document.referrer.includes(window.location.host)) ||
+    (typeof window !== 'undefined' && window.history.length > 1)
+  );
+
+  // Close search modal on browser/phone back gesture if open
+  useEffect(() => {
+    if (isSearchModalOpen) {
+      window.history.pushState({ modal: 'search' }, '');
+      const handlePopState = () => {
+        setIsSearchModalOpen(false);
+      };
+      window.addEventListener('popstate', handlePopState, { once: true });
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+      };
+    }
+  }, [isSearchModalOpen]);
 
   // Secret Logo Multi-click unlock for testing & authorized admins
   const logoClickCountRef = useRef<number>(0);
@@ -336,10 +382,7 @@ export const App: React.FC = () => {
       const updatedNode: RoadNode = {
         ...node,
         pixelCoord: newPixel,
-        normalizedCoord: {
-          x: newPixel.x / 1280,
-          y: newPixel.y / 774,
-        },
+        normalizedCoord: pixelToNormalized(newPixel),
       };
       return {
         ...prev,
@@ -493,12 +536,9 @@ export const App: React.FC = () => {
         const newBuilding: CampusPosition = {
           id: newId,
           name: name.trim() || `Building ${newId}`,
-          description: `Campus building ${newId}`,
+          description: '',
           pixelCoord,
-          normalizedCoord: {
-            x: pixelCoord.x / 1280,
-            y: pixelCoord.y / 774,
-          },
+          normalizedCoord: pixelToNormalized(pixelCoord),
           roadNetworkNodeId: nearestNode ? nearestNode.id : 'node_53skt',
           category: 'academic',
         };
@@ -526,32 +566,27 @@ export const App: React.FC = () => {
       if (targetAccessPositionId !== null) {
         pushUndo();
         const nearestNode = findNearestNode(clickedPoint, activeRoadGraph);
-        if (nearestNode) {
-          setRoadData((prev) => {
-            const updated = {
-              ...prev,
-              accessPoints: {
-                ...prev.accessPoints,
-                [targetAccessPositionId]: {
-                  positionId: targetAccessPositionId,
-                  pixelCoord: clickedPoint,
-                  normalizedCoord: {
-                    x: clickedPoint.x / 1280,
-                    y: clickedPoint.y / 774,
-                  },
-                  connectedRoadNodeId: nearestNode.id,
-                },
+        setRoadData((prev) => {
+          const updated = {
+            ...prev,
+            accessPoints: {
+              ...prev.accessPoints,
+              [targetAccessPositionId]: {
+                positionId: targetAccessPositionId,
+                pixelCoord: clickedPoint,
+                normalizedCoord: pixelToNormalized(clickedPoint),
+                connectedRoadNodeId: nearestNode ? nearestNode.id : '',
               },
-            };
-            try {
-              localStorage.setItem(ROAD_NETWORK_STORAGE_KEY, JSON.stringify(updated));
-            } catch {
-              // ignore
-            }
-            return updated;
-          });
-          setTargetAccessPositionId(null);
-        }
+            },
+          };
+          try {
+            localStorage.setItem(ROAD_NETWORK_STORAGE_KEY, JSON.stringify(updated));
+          } catch {
+            // ignore
+          }
+          return updated;
+        });
+        setTargetAccessPositionId(null);
         return;
       }
 
@@ -562,10 +597,7 @@ export const App: React.FC = () => {
               return {
                 ...pos,
                 pixelCoord: clickedPoint,
-                normalizedCoord: {
-                  x: clickedPoint.x / 1280,
-                  y: clickedPoint.y / 774,
-                },
+                normalizedCoord: pixelToNormalized(clickedPoint),
               };
             }
             return pos;
@@ -587,10 +619,7 @@ export const App: React.FC = () => {
         const newNode: RoadNode = {
           id: newNodeId,
           pixelCoord: clickedPoint,
-          normalizedCoord: {
-            x: clickedPoint.x / 1280,
-            y: clickedPoint.y / 774,
-          },
+          normalizedCoord: pixelToNormalized(clickedPoint),
         };
 
         setRoadData((prev) => {
@@ -747,6 +776,50 @@ export const App: React.FC = () => {
     [roadData.accessPoints, activeRoadGraph, pushUndo]
   );
 
+  const handleDeleteAccessPoint = useCallback((posId: number) => {
+    pushUndo();
+    setRoadData((prev) => {
+      const nextAccess = { ...prev.accessPoints };
+      delete nextAccess[posId];
+      const updated = {
+        ...prev,
+        accessPoints: nextAccess,
+      };
+      try {
+        localStorage.setItem(ROAD_NETWORK_STORAGE_KEY, JSON.stringify(updated));
+      } catch {
+        // ignore
+      }
+      return updated;
+    });
+  }, [pushUndo]);
+
+  const handleAccessPointDrag = useCallback((posId: number, pt: PixelPoint) => {
+    setRoadData((prev) => {
+      const existing = prev.accessPoints[posId];
+      if (!existing) return prev;
+      const nearest = findNearestNode(pt, activeRoadGraph);
+      const updated = {
+        ...prev,
+        accessPoints: {
+          ...prev.accessPoints,
+          [posId]: {
+            ...existing,
+            pixelCoord: pt,
+            normalizedCoord: pixelToNormalized(pt),
+            connectedRoadNodeId: nearest ? nearest.id : existing.connectedRoadNodeId,
+          },
+        },
+      };
+      try {
+        localStorage.setItem(ROAD_NETWORK_STORAGE_KEY, JSON.stringify(updated));
+      } catch {
+        // ignore
+      }
+      return updated;
+    });
+  }, [activeRoadGraph]);
+
   // Position relocation handlers
   const handleStartMovePosition = useCallback((posId: number) => {
     setTargetMovePositionId(posId);
@@ -759,10 +832,7 @@ export const App: React.FC = () => {
           return {
             ...pos,
             pixelCoord: newPt,
-            normalizedCoord: {
-              x: newPt.x / 1280,
-              y: newPt.y / 774,
-            },
+            normalizedCoord: pixelToNormalized(newPt),
           };
         }
         return pos;
@@ -815,6 +885,18 @@ export const App: React.FC = () => {
   const handleUpdateBuildingName = useCallback((posId: number, name: string) => {
     setPositions((prev) => {
       const updated = prev.map((p) => (p.id === posId ? { ...p, name } : p));
+      try {
+        localStorage.setItem(CAMPUS_POSITIONS_STORAGE_KEY, JSON.stringify(updated));
+      } catch {
+        // ignore
+      }
+      return updated;
+    });
+  }, []);
+
+  const handleUpdateBuildingCategory = useCallback((posId: number, category: string) => {
+    setPositions((prev) => {
+      const updated = prev.map((p) => (p.id === posId ? { ...p, category } : p));
       try {
         localStorage.setItem(CAMPUS_POSITIONS_STORAGE_KEY, JSON.stringify(updated));
       } catch {
@@ -1199,7 +1281,7 @@ export const App: React.FC = () => {
       setLastInvalidClick(null);
       setOutsideBoundaryToast(null);
 
-      if (selectedStage && route) {
+      if (selectedStage) {
         const newRoute = calculateRoute(
           clickedPoint,
           selectedStage.positionId,
@@ -1211,7 +1293,7 @@ export const App: React.FC = () => {
         setRoute(newRoute);
       }
     },
-    [selectedStage, route, activeRoadGraph, roadData.accessPoints, positions]
+    [selectedStage, activeRoadGraph, roadData.accessPoints, positions]
   );
 
   // Handle clicking outside boundary in deep forest
@@ -1230,7 +1312,7 @@ export const App: React.FC = () => {
     setLastInvalidClick(null);
     setOutsideBoundaryToast(null);
 
-    if (selectedStage && route) {
+    if (selectedStage) {
       const newRoute = calculateRoute(
         defaultStartPoint,
         selectedStage.positionId,
@@ -1241,28 +1323,29 @@ export const App: React.FC = () => {
       );
       setRoute(newRoute);
     }
-  }, [defaultStartPoint, selectedStage, route, activeRoadGraph, roadData.accessPoints, positions]);
+  }, [defaultStartPoint, selectedStage, activeRoadGraph, roadData.accessPoints, positions]);
 
   // Handle selecting a destination stage
   const handleSelectStage = useCallback(
     (stage: Stage) => {
       setSelectedStage(stage);
       setRoutingError(null);
-      if (route) {
-        const result = calculateRoute(
-          startPoint,
-          stage.positionId,
-          undefined,
-          activeRoadGraph,
-          roadData.accessPoints,
-          positions
-        );
-        if (result && result.points.length >= 2) {
-          setRoute(result);
-        }
+      const result = calculateRoute(
+        startPoint,
+        stage.positionId,
+        undefined,
+        activeRoadGraph,
+        roadData.accessPoints,
+        positions
+      );
+      if (result && result.points.length >= 2) {
+        setRoute(result);
+      } else {
+        setRoute(null);
+        setRoutingError('Could not find a valid walkable path to this destination.');
       }
     },
-    [route, startPoint, activeRoadGraph, roadData.accessPoints, positions]
+    [startPoint, activeRoadGraph, roadData.accessPoints, positions]
   );
 
   // Clear destination
@@ -1288,21 +1371,19 @@ export const App: React.FC = () => {
 
       setSelectedStage(chosen);
       setRoutingError(null);
-      if (route) {
-        const result = calculateRoute(
-          startPoint,
-          chosen.positionId,
-          undefined,
-          activeRoadGraph,
-          roadData.accessPoints,
-          positions
-        );
-        if (result && result.points.length >= 2) {
-          setRoute(result);
-        }
+      const result = calculateRoute(
+        startPoint,
+        chosen.positionId,
+        undefined,
+        activeRoadGraph,
+        roadData.accessPoints,
+        positions
+      );
+      if (result && result.points.length >= 2) {
+        setRoute(result);
       }
     },
-    [stages, route, startPoint, activeRoadGraph, roadData.accessPoints, positions]
+    [stages, startPoint, activeRoadGraph, roadData.accessPoints, positions]
   );
 
   // Calculate & Draw Route when "Get Directions" is clicked
@@ -1435,6 +1516,8 @@ export const App: React.FC = () => {
           onNodeClick={handleNodeClick}
           onEdgeClick={handleEdgeClick}
           onMapClickForEditor={handleMapClickForEditor}
+          onAccessPointDrag={handleAccessPointDrag}
+          onCancelSetAccessPoint={() => setTargetAccessPositionId(null)}
           // Position Relocation & Adding Buildings
           targetMovePositionId={targetMovePositionId}
           onPositionDrag={handlePositionDrag}
@@ -1474,6 +1557,8 @@ export const App: React.FC = () => {
         onToggleEditor={() => setIsEditorOpen((prev) => !prev)}
         isEditorOpen={isEditorOpen}
         onLogoClick={handleLogoClick}
+        hasParentWebsite={hasParentWebsite}
+        onBackToParent={handleBackToParent}
       />
 
       {/* Mobile compact FROM | TO search card */}
@@ -1485,6 +1570,11 @@ export const App: React.FC = () => {
         onOpenSearch={() => setIsSearchModalOpen(true)}
         onClearDestination={handleClearDestination}
         onResetNavigation={handleResetNavigation}
+        isDevMode={isDevMode}
+        onToggleEditor={() => setIsEditorOpen((prev) => !prev)}
+        isEditorOpen={isEditorOpen}
+        hasParentWebsite={hasParentWebsite}
+        onBackToParent={handleBackToParent}
       />
 
       {/* Mobile contextual bottom drawer (only while a location is selected) */}
@@ -1494,6 +1584,7 @@ export const App: React.FC = () => {
         stages={stages}
         onSelectStage={handleMobileSelectStage}
         route={route}
+        onClearRoute={handleClearRoute}
         routingError={routingError}
       />
 
@@ -1544,10 +1635,15 @@ export const App: React.FC = () => {
         entranceNodeId={entranceNode?.id ?? null}
         onToggleEntranceNode={handleToggleEntranceNode}
         onStartSetAccessPoint={(posId) => {
-          setTargetAccessPositionId(posId);
-          setActiveEditorTool('draw');
+          if (posId === -1 || targetAccessPositionId === posId) {
+            setTargetAccessPositionId(null);
+          } else {
+            setTargetAccessPositionId(posId);
+            setActiveEditorTool('draw');
+          }
         }}
         onSnapAccessPointToNearestNode={handleSnapAccessPointToNearestNode}
+        onDeleteAccessPoint={handleDeleteAccessPoint}
         disconnectedNodeIds={disconnectedNodeIds}
         unreachablePositionIds={unreachablePositionIds}
         onTestRoute={(posId) => {
@@ -1558,6 +1654,7 @@ export const App: React.FC = () => {
         // Campus Positions & Building Management Controls
         positions={positions}
         stages={stages}
+        selectedStage={selectedStage}
         targetMovePositionId={targetMovePositionId}
         pendingAddBuildingName={pendingAddBuildingName}
         onStartMovePosition={handleStartMovePosition}
@@ -1567,6 +1664,7 @@ export const App: React.FC = () => {
         onStartAddBuilding={handleStartAddBuilding}
         onCancelAddBuilding={handleCancelAddBuilding}
         onUpdateBuildingName={handleUpdateBuildingName}
+        onUpdateBuildingCategory={handleUpdateBuildingCategory}
         onDeleteBuilding={handleDeleteBuilding}
         onAddStage={handleAddStage}
         onUpdateStage={handleUpdateStage}

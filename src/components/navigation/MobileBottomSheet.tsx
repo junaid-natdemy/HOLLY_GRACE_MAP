@@ -148,7 +148,10 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
             <p className="mt-0.5 truncate text-[11px] font-medium text-slate-500">
               {selectedStage.stageNumber > 0
                 ? selectedStage.name.trim()
-                : selectedPosition.description}
+                : selectedPosition.description &&
+                  !/^campus building \d+$/i.test(selectedPosition.description.trim())
+                ? selectedPosition.description
+                : selectedPosition.category || 'Campus Destination'}
             </p>
             {route && (
               <div className="mt-1 flex items-center gap-1.5 flex-wrap">
@@ -206,9 +209,12 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
                 <Building2 className="h-4 w-4 shrink-0 text-blue-600" />
                 <h3 className="truncate text-[13px] font-extrabold text-slate-900">{buildingName}</h3>
               </div>
-              <p className="mt-0.5 line-clamp-2 text-[11px] font-medium leading-snug text-slate-500">
-                {selectedPosition.description}
-              </p>
+              {selectedPosition.description &&
+                !/^campus building \d+$/i.test(selectedPosition.description.trim()) && (
+                  <p className="mt-0.5 line-clamp-2 text-[11px] font-medium leading-snug text-slate-500">
+                    {selectedPosition.description}
+                  </p>
+                )}
             </div>
             <button
               type="button"
@@ -266,10 +272,16 @@ export const MobileBottomSheet: React.FC<MobileBottomSheetProps> = ({
                         isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-800'
                       }`}
                     >
-                      <span className="text-[6.5px] font-bold uppercase leading-none tracking-wider opacity-80">
-                        Stg
-                      </span>
-                      <span className="text-[11px] font-black leading-none">{stage.stageNumber}</span>
+                      {stage.stageNumber > 0 ? (
+                        <>
+                          <span className="text-[6.5px] font-bold uppercase leading-none tracking-wider opacity-80">
+                            Stg
+                          </span>
+                          <span className="text-[11px] font-black leading-none">{stage.stageNumber}</span>
+                        </>
+                      ) : (
+                        <span className="text-[9px] font-black uppercase leading-none">MAIN</span>
+                      )}
                     </div>
 
                     <div className="min-w-0 flex-1">

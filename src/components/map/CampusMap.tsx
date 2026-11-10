@@ -16,6 +16,7 @@ import { MapMarkers } from './MapMarkers';
 import { RouteOverlay } from './RouteOverlay';
 import { StartPointMarker } from './StartPointMarker';
 import { CampusBoundaryOverlay } from './CampusBoundaryOverlay';
+import { X } from 'lucide-react';
 
 interface CampusMapProps {
   selectedPosition: CampusPosition | null;
@@ -50,6 +51,8 @@ interface CampusMapProps {
   onNodeClick?: (nodeId: string, e: React.MouseEvent) => void;
   onEdgeClick?: (fromId: string, toId: string, e: React.MouseEvent) => void;
   onMapClickForEditor?: (pt: PixelPoint) => void;
+  onAccessPointDrag?: (posId: number, pt: PixelPoint) => void;
+  onCancelSetAccessPoint?: () => void;
 
   // Campus Positions Relocation Props
   targetMovePositionId?: number | null;
@@ -100,6 +103,8 @@ export const CampusMap: React.FC<CampusMapProps> = ({
   onNodeClick,
   onEdgeClick,
   onMapClickForEditor,
+  onAccessPointDrag,
+  onCancelSetAccessPoint,
 
   // Position relocation
   targetMovePositionId = null,
@@ -134,19 +139,18 @@ export const CampusMap: React.FC<CampusMapProps> = ({
   } = useMapTransform();
   const isMobileViewport = useIsMobile();
 
-  // Desktop recentres on a new destination. Mobile keeps the current view.
+  // Focus smoothly on the selected destination (both desktop and mobile)
   const lastFocusedKey = useRef<string | null>(null);
   useEffect(() => {
     if (!selectedPosition) {
       lastFocusedKey.current = null;
       return;
     }
-    if (isMobileViewport) return;
     const currentKey = `${selectedPosition.id}-${selectedStageNumber ?? 0}`;
     if (lastFocusedKey.current === currentKey) return;
     lastFocusedKey.current = currentKey;
     focusOnCoordinate(selectedPosition.pixelCoord);
-  }, [selectedPosition, selectedStageNumber, focusOnCoordinate, isMobileViewport]);
+  }, [selectedPosition, selectedStageNumber, focusOnCoordinate]);
 
   // Mobile reset returns the map to its initial pan/zoom.
   useEffect(() => {
@@ -242,7 +246,10 @@ export const CampusMap: React.FC<CampusMapProps> = ({
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onClick={handleMapClick}
-      onMouseLeave={() => setHoveredPoint(null)}
+      onMouseLeave={() => {
+        handlers.onMouseLeave();
+        setHoveredPoint(null);
+      }}
     >
       {/* Interactive Transform Canvas */}
       <div
@@ -322,6 +329,8 @@ export const CampusMap: React.FC<CampusMapProps> = ({
               onNodeClick={onNodeClick ?? (() => {})}
               onEdgeClick={onEdgeClick ?? (() => {})}
               disconnectedNodeIds={disconnectedNodeIds}
+              positions={positions}
+              onAccessPointDrag={onAccessPointDrag}
             />
           )}
         </svg>
@@ -329,10 +338,19 @@ export const CampusMap: React.FC<CampusMapProps> = ({
 
       {/* Floating Status Banner (when setting destination access point) */}
       {isEditorOpen && targetAccessPositionId !== null && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-auto">
-          <div className="bg-amber-600/95 backdrop-blur-md text-white text-xs font-semibold px-4 py-2 rounded-full shadow-xl border border-amber-400 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 pointer-events-auto animate-fade-in">
+          <div className="bg-amber-600/95 backdrop-blur-md text-white text-xs font-bold px-4 py-2 rounded-full shadow-2xl border-2 border-amber-300 flex items-center gap-2.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-white animate-ping" />
             <span>Click on map to place Access Point for &ldquo;{positions?.find((p) => p.id === targetAccessPositionId)?.name || 'Building'}&rdquo;</span>
+            {onCancelSetAccessPoint && (
+              <button
+                onClick={onCancelSetAccessPoint}
+                className="ml-1 p-0.5 hover:bg-amber-700 rounded-full transition-colors"
+                title="Cancel"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
       )}

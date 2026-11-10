@@ -49,6 +49,20 @@ body, html, #root {
   animation: routeDash 1s linear infinite;
 }
 
+/* Animated SVG Walking Dots Flow */
+@keyframes walkingDotsFlow {
+  from {
+    stroke-dashoffset: 22;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-walking-dots {
+  animation: walkingDotsFlow 1.2s linear infinite;
+}
+
 /* Slow Ping animation */
 @keyframes pingSlow {
   0% {

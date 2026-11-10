@@ -32,6 +32,7 @@ import {
   Plus,
   RotateCcw,
   Save,
+  Search,
   Shield,
   Trash2,
   Undo2,
@@ -60,6 +61,7 @@ interface RoadNetworkEditorProps {
   onToggleEntranceNode: (nodeId: string) => void;
   onStartSetAccessPoint: (posId: number) => void;
   onSnapAccessPointToNearestNode: (posId: number) => void;
+  onDeleteAccessPoint?: (posId: number) => void;
   disconnectedNodeIds: Set<string>;
   unreachablePositionIds: number[];
   onTestRoute: (positionId: number) => void;
@@ -69,6 +71,7 @@ interface RoadNetworkEditorProps {
   // Campus Position & Building Management Props
   positions?: CampusPosition[];
   stages?: Stage[];
+  selectedStage?: Stage | null;
   targetMovePositionId?: number | null;
   pendingAddBuildingName?: string | null;
   onStartMovePosition?: (posId: number) => void;
@@ -78,6 +81,7 @@ interface RoadNetworkEditorProps {
   onStartAddBuilding?: (name: string) => void;
   onCancelAddBuilding?: () => void;
   onUpdateBuildingName?: (posId: number, name: string) => void;
+  onUpdateBuildingCategory?: (posId: number, category: string) => void;
   onDeleteBuilding?: (posId: number) => void;
   onAddStage?: (positionId: number, stage: { stageNumber: number; name: string; floor?: string }) => void;
   onUpdateStage?: (oldStageNumber: number, positionId: number, updates: { stageNumber?: number; name?: string; floor?: string }) => void;
@@ -126,6 +130,7 @@ export const RoadNetworkEditor: React.FC<RoadNetworkEditorProps> = ({
   onToggleEntranceNode,
   onStartSetAccessPoint,
   onSnapAccessPointToNearestNode,
+  onDeleteAccessPoint,
   disconnectedNodeIds,
   unreachablePositionIds,
   onTestRoute,
@@ -135,6 +140,7 @@ export const RoadNetworkEditor: React.FC<RoadNetworkEditorProps> = ({
   // Position relocation props
   positions,
   stages = CAMPUS_STAGES,
+  selectedStage = null,
   targetMovePositionId = null,
   pendingAddBuildingName = null,
   onStartMovePosition,
@@ -144,6 +150,7 @@ export const RoadNetworkEditor: React.FC<RoadNetworkEditorProps> = ({
   onStartAddBuilding,
   onCancelAddBuilding,
   onUpdateBuildingName,
+  onUpdateBuildingCategory,
   onDeleteBuilding,
   onAddStage,
   onUpdateStage,
@@ -187,6 +194,7 @@ export const RoadNetworkEditor: React.FC<RoadNetworkEditorProps> = ({
   const [stageFormNum, setStageFormNum] = useState<string>('');
   const [stageFormName, setStageFormName] = useState<string>('');
   const [stageFormFloor, setStageFormFloor] = useState<string>('');
+  const [accessSearchQuery, setAccessSearchQuery] = useState<string>('');
 
   // Movable / Draggable Modal State
   const [modalPosition, setModalPosition] = useState<{ x: number; y: number } | null>(null);
@@ -830,6 +838,23 @@ export const CAMPUS_POSITIONS: CampusPosition[] = ${JSON.stringify(activePositio
                               placeholder="Building Name"
                               title="Click to rename building"
                             />
+                            <select
+                              value={pos.category || 'academic'}
+                              onChange={(e) => onUpdateBuildingCategory?.(pos.id, e.target.value)}
+                              className="bg-slate-900 border border-slate-700/80 rounded-xl px-2 py-1 text-[11px] font-semibold text-slate-300 focus:outline-none focus:border-blue-500 shrink-0 cursor-pointer"
+                              title="Select Category"
+                            >
+                              <option value="academic">Academic</option>
+                              <option value="auditorium">Auditorium</option>
+                              <option value="stage_complex">Stage</option>
+                              <option value="bike_parking">Bike Parking</option>
+                              <option value="car_parking">Car Parking</option>
+                              <option value="vip_parking">VIP Parking</option>
+                              <option value="outdoor">Outdoor / Ground</option>
+                              <option value="administrative">Hostel / Admin</option>
+                              <option value="commercial">Stall</option>
+                              <option value="gate">Gate / Exit</option>
+                            </select>
                           </div>
 
                           <div className="flex items-center gap-1.5 shrink-0">
@@ -1327,81 +1352,247 @@ export const CAMPUS_POSITIONS: CampusPosition[] = ${JSON.stringify(activePositio
             )}
 
             {/* TAB 3: ACCESS POINTS (PHASE 3) */}
-            {activeTab === 'access_points' && (
-              <div className="space-y-2.5">
-                <div className="p-2 rounded-xl bg-amber-950/30 border border-amber-800/40 text-[11px] text-amber-200 leading-relaxed">
-                  <strong>Access Points</strong> are where visitors step off the road to enter a building or arena (distinct from building roof badges).
-                </div>
+            {activeTab === 'access_points' && (() => {
+              const currentDestPosition = selectedStage
+                ? activePositions.find((p) => p.id === selectedStage.positionId) || null
+                : null;
 
-                <div className="space-y-2">
-                  {activePositions.map((pos) => {
-                    const ap = roadData.accessPoints[pos.id];
-                    const isTargeted = targetAccessPositionId === pos.id;
+              const trimmedSearch = accessSearchQuery.trim().toLowerCase();
+              const filteredAccessPositions = activePositions.filter((pos) => {
+                if (!trimmedSearch) return true;
+                const bldMatches =
+                  pos.name.toLowerCase().includes(trimmedSearch) ||
+                  String(pos.id) === trimmedSearch;
+                const bldStages = stages.filter((s) => s.positionId === pos.id);
+                const stageMatches = bldStages.some(
+                  (s) =>
+                    s.name.toLowerCase().includes(trimmedSearch) ||
+                    String(s.stageNumber) === trimmedSearch
+                );
+                return bldMatches || stageMatches;
+              });
 
-                    return (
-                      <div
-                        key={`ap-card-${pos.id}`}
-                        className={`p-2.5 rounded-xl border transition-all ${
-                          isTargeted
-                            ? 'bg-amber-950/60 border-amber-400 shadow-md shadow-amber-900/30'
-                            : 'bg-slate-800/70 border-slate-700/80 hover:border-slate-600'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-1.5">
-                          <div className="flex items-center gap-1.5">
-                            <span className="w-5 h-5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/50 flex items-center justify-center font-black text-[10px]">
-                              {pos.id}
+              return (
+                <div className="space-y-2.5">
+                  <div className="p-2 rounded-xl bg-amber-950/30 border border-amber-800/40 text-[11px] text-amber-200 leading-relaxed">
+                    <strong>Access Points</strong> are where visitors step off the road to enter a building or arena (distinct from building roof badges).
+                  </div>
+
+                  {/* ACTIVE DESTINATION HIGHLIGHT CARD */}
+                  {currentDestPosition && (
+                    <div className="p-3 rounded-xl bg-amber-950/70 border-2 border-amber-400 shadow-lg shadow-amber-950/50">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 font-black text-[9px] uppercase tracking-wider shrink-0">
+                            Current Route Destination
+                          </span>
+                          <span className="font-extrabold text-amber-200 text-xs truncate">
+                            {currentDestPosition.name}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-amber-300 font-mono font-bold shrink-0">
+                          Pos #{currentDestPosition.id}
+                        </span>
+                      </div>
+
+                      {roadData.accessPoints[currentDestPosition.id] ? (
+                        <div className="space-y-1.5 text-[11px] text-slate-300 bg-slate-900/60 p-2 rounded-lg">
+                          <div className="flex items-center justify-between text-[10px] text-emerald-400 font-bold">
+                            <span className="flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5" /> Access Point Active
                             </span>
-                            <span className="font-bold text-slate-200 text-xs">{pos.name}</span>
+                            <span>
+                              Node: <code className="text-cyan-300 font-mono">{roadData.accessPoints[currentDestPosition.id].connectedRoadNodeId || 'Snapped'}</code>
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5 pt-0.5">
+                            <button
+                              onClick={() => onStartSetAccessPoint(targetAccessPositionId === currentDestPosition.id ? -1 : currentDestPosition.id)}
+                              className={`flex-1 py-1 px-2 rounded-lg text-[10px] font-semibold flex items-center justify-center gap-1 transition-all ${
+                                targetAccessPositionId === currentDestPosition.id
+                                  ? 'bg-amber-500 text-slate-950 font-bold ring-2 ring-amber-300 animate-pulse'
+                                  : 'bg-slate-700 hover:bg-slate-600 text-amber-300'
+                              }`}
+                            >
+                              <MapPin className="w-3 h-3" />
+                              <span>{targetAccessPositionId === currentDestPosition.id ? '📍 Click Map to Re-place' : 'Re-position on Map'}</span>
+                            </button>
+                            <button
+                              onClick={() => onSnapAccessPointToNearestNode(currentDestPosition.id)}
+                              className="py-1 px-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 text-[10px] font-medium"
+                            >
+                              Snap to Road
+                            </button>
+                            {onDeleteAccessPoint && (
+                              <button
+                                onClick={() => onDeleteAccessPoint(currentDestPosition.id)}
+                                className="py-1 px-2 rounded-lg bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-800/40 text-[10px] font-medium transition-colors"
+                                title="Delete"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            )}
                           </div>
                         </div>
-
-                        {ap ? (
-                          <div className="space-y-1.5 text-[11px] text-slate-400">
-                            <div className="flex items-center justify-between text-[10px]">
-                              <span>
-                                Coord: ({Math.round(ap.pixelCoord.x)}, {Math.round(ap.pixelCoord.y)})
-                              </span>
-                              <span>Node: <code className="text-cyan-300 font-mono">{ap.connectedRoadNodeId}</code></span>
-                            </div>
-
-                            <div className="flex items-center gap-1.5 pt-1">
-                              <button
-                                onClick={() => onStartSetAccessPoint(pos.id)}
-                                className={`flex-1 py-1 px-2 rounded-lg text-[10px] font-semibold flex items-center justify-center gap-1 transition-all ${
-                                  isTargeted
-                                    ? 'bg-amber-500 text-slate-950 font-bold'
-                                    : 'bg-slate-700 hover:bg-slate-600 text-amber-300'
-                                }`}
-                              >
-                                <MapPin className="w-3 h-3" />
-                                <span>{isTargeted ? 'Click map to place' : 'Pick on Map'}</span>
-                              </button>
-
-                              <button
-                                onClick={() => onSnapAccessPointToNearestNode(pos.id)}
-                                className="py-1 px-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 text-[10px] font-medium"
-                                title="Snap access point to nearest road node"
-                              >
-                                Snap to Road
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
+                      ) : (
+                        <div>
+                          <p className="text-[10.5px] text-amber-200/90 mb-2">
+                            ⚠️ No access point set for <strong>{currentDestPosition.name}</strong>. The route will lead to the roof badge until an entrance is set.
+                          </p>
                           <button
-                            onClick={() => onStartSetAccessPoint(pos.id)}
-                            className="w-full py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-semibold text-[11px] flex items-center justify-center gap-1"
+                            onClick={() => onStartSetAccessPoint(targetAccessPositionId === currentDestPosition.id ? -1 : currentDestPosition.id)}
+                            className={`w-full py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
+                              targetAccessPositionId === currentDestPosition.id
+                                ? 'bg-amber-500 text-slate-950 ring-2 ring-amber-300 shadow-lg shadow-amber-500/40 animate-pulse'
+                                : 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md'
+                            }`}
                           >
-                            <MapPin className="w-3 h-3" />
-                            <span>Set Access Point</span>
+                            <MapPin className="w-4 h-4" />
+                            <span>{targetAccessPositionId === currentDestPosition.id ? '📍 Click Map to Place Entrance Door...' : `Set Access Point for ${currentDestPosition.name}`}</span>
                           </button>
-                        )}
-                      </div>
-                    );
-                  })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Search filter for all buildings */}
+                  <div className="relative">
+                    <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      value={accessSearchQuery}
+                      onChange={(e) => setAccessSearchQuery(e.target.value)}
+                      placeholder="Search building or stage number..."
+                      className="w-full pl-8 pr-7 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-amber-500"
+                    />
+                    {accessSearchQuery && (
+                      <button
+                        onClick={() => setAccessSearchQuery('')}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 p-0.5"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* All Building Cards */}
+                  <div className="space-y-2">
+                    {filteredAccessPositions.map((pos) => {
+                      const ap = roadData.accessPoints[pos.id];
+                      const isTargeted = targetAccessPositionId === pos.id;
+                      const bldStages = stages.filter((s) => s.positionId === pos.id);
+
+                      return (
+                        <div
+                          key={`ap-card-${pos.id}`}
+                          className={`p-2.5 rounded-xl border transition-all ${
+                            isTargeted
+                              ? 'bg-amber-950/60 border-amber-400 shadow-md shadow-amber-900/30'
+                              : 'bg-slate-800/70 border-slate-700/80 hover:border-slate-600'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1.5">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className="w-5 h-5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/50 flex items-center justify-center font-black text-[10px] shrink-0">
+                                {pos.id}
+                              </span>
+                              <span className="font-bold text-slate-200 text-xs truncate">{pos.name}</span>
+                            </div>
+                            {bldStages.length > 0 && (
+                              <span className="text-[9.5px] font-semibold text-indigo-300 bg-indigo-950/60 border border-indigo-700/50 px-1.5 py-0.5 rounded shrink-0">
+                                {bldStages.length} {bldStages.length === 1 ? 'Stage' : 'Stages'}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Show which stages belong to this building */}
+                          {bldStages.length > 0 && (
+                            <div className="mb-2 flex flex-wrap gap-1">
+                              {bldStages.slice(0, 3).map((s) => (
+                                <span
+                                  key={`stage-chip-${pos.id}-${s.stageNumber}`}
+                                  className="text-[9px] bg-slate-900 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700/60"
+                                >
+                                  {s.stageNumber > 0 ? `Stage ${s.stageNumber}` : 'Main Stage'}
+                                  {s.floor ? ` · ${s.floor}` : ''}
+                                </span>
+                              ))}
+                              {bldStages.length > 3 && (
+                                <span className="text-[9px] text-slate-400">
+                                  +{bldStages.length - 3} more
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          {ap ? (
+                            <div className="space-y-1.5 text-[11px] text-slate-400">
+                              <div className="flex items-center justify-between text-[10px]">
+                                <span>
+                                  Coord: ({Math.round(ap.pixelCoord.x)}, {Math.round(ap.pixelCoord.y)})
+                                </span>
+                                <span>
+                                  Node:{' '}
+                                  {ap.connectedRoadNodeId ? (
+                                    <code className="text-cyan-300 font-mono">{ap.connectedRoadNodeId}</code>
+                                  ) : (
+                                    <span className="text-amber-400 font-medium italic">Not connected yet</span>
+                                  )}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-1.5 pt-1">
+                                <button
+                                  onClick={() => onStartSetAccessPoint(isTargeted ? -1 : pos.id)}
+                                  className={`flex-1 py-1 px-2 rounded-lg text-[10px] font-semibold flex items-center justify-center gap-1 transition-all ${
+                                    isTargeted
+                                      ? 'bg-amber-500 text-slate-950 font-bold ring-2 ring-amber-300 animate-pulse'
+                                      : 'bg-slate-700 hover:bg-slate-600 text-amber-300'
+                                  }`}
+                                >
+                                  <MapPin className="w-3 h-3" />
+                                  <span>{isTargeted ? '📍 Click Map to Re-place' : 'Pick on Map'}</span>
+                                </button>
+
+                                <button
+                                  onClick={() => onSnapAccessPointToNearestNode(pos.id)}
+                                  className="py-1 px-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 text-[10px] font-medium"
+                                  title="Snap access point to nearest road node"
+                                >
+                                  Snap to Road
+                                </button>
+
+                                {onDeleteAccessPoint && (
+                                  <button
+                                    onClick={() => onDeleteAccessPoint(pos.id)}
+                                    className="py-1 px-2 rounded-lg bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-800/40 text-[10px] font-medium transition-colors"
+                                    title="Delete access point"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => onStartSetAccessPoint(isTargeted ? -1 : pos.id)}
+                              className={`w-full py-1.5 rounded-lg font-semibold text-[11px] flex items-center justify-center gap-1.5 transition-all ${
+                                isTargeted
+                                  ? 'bg-amber-500 text-slate-950 font-bold ring-2 ring-amber-300 shadow-lg shadow-amber-500/30 animate-pulse'
+                                  : 'bg-amber-600 hover:bg-amber-500 text-white'
+                              }`}
+                            >
+                              <MapPin className="w-3.5 h-3.5" />
+                              <span>{isTargeted ? '📍 Click Map to Place Access Point...' : 'Set Access Point'}</span>
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* TAB 4: VERIFY & TEST (PHASE 6) */}
             {activeTab === 'validation' && (

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { CampusPosition, PixelPoint, Stage } from '../../types/campus';
 import { formatBuildingDisplayName } from '../../config/campusPositions';
-import { Search, X, RotateCcw } from 'lucide-react';
+import { Search, X, RotateCcw, ArrowLeft } from 'lucide-react';
 
 interface MobileNavHeaderProps {
   startPoint: PixelPoint;
@@ -11,6 +11,11 @@ interface MobileNavHeaderProps {
   onOpenSearch: () => void;
   onClearDestination: () => void;
   onResetNavigation: () => void;
+  isDevMode?: boolean;
+  onToggleEditor?: () => void;
+  isEditorOpen?: boolean;
+  hasParentWebsite?: boolean;
+  onBackToParent?: () => void;
 }
 
 /** Nearest named campus landmark to a tapped map point (no geocoding involved). */
@@ -39,6 +44,11 @@ export const MobileNavHeader: React.FC<MobileNavHeaderProps> = ({
   onOpenSearch,
   onClearDestination,
   onResetNavigation,
+  isDevMode = false,
+  onToggleEditor,
+  isEditorOpen = false,
+  hasParentWebsite = false,
+  onBackToParent,
 }) => {
   const headerRef = useRef<HTMLDivElement | null>(null);
 
@@ -72,6 +82,19 @@ export const MobileNavHeader: React.FC<MobileNavHeaderProps> = ({
     >
       {/* One compact horizontal FROM | TO card */}
       <div className="flex items-center gap-1 rounded-2xl border border-slate-200/80 bg-white/95 p-1.5 shadow-[0_10px_30px_-8px_rgba(15,23,42,0.45)] backdrop-blur-xl">
+        {/* Back to Parent Website Button */}
+        {hasParentWebsite && onBackToParent && (
+          <button
+            type="button"
+            onClick={onBackToParent}
+            className="flex items-center justify-center w-7 h-7 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 transition-all shrink-0"
+            title="Return to Main Website"
+            aria-label="Back to main website"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+          </button>
+        )}
+
         {/* FROM (set by tapping the map) */}
         <div className="flex min-w-0 flex-1 items-center gap-1.5 rounded-xl px-1 py-1">
           <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500 ring-2 ring-emerald-100" />
@@ -137,6 +160,22 @@ export const MobileNavHeader: React.FC<MobileNavHeaderProps> = ({
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 active:bg-slate-200"
           >
             <RotateCcw className="h-3.5 w-3.5" />
+          </button>
+        )}
+
+        {isDevMode && onToggleEditor && (
+          <button
+            type="button"
+            aria-label="Toggle Developer Editor"
+            title="Toggle Developer Editor"
+            onClick={onToggleEditor}
+            className={`flex h-8 px-2 shrink-0 items-center justify-center rounded-xl text-[10px] font-bold transition-colors ${
+              isEditorOpen
+                ? 'bg-cyan-600 text-white shadow-sm ring-1 ring-cyan-400'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            Dev
           </button>
         )}
       </div>

@@ -1,5 +1,7 @@
 import React, { useCallback, useRef } from 'react';
+import { MAP_CONFIG } from '../../config/mapConfig';
 import {
+  CampusPosition,
   DestinationAccessPoint,
   PixelPoint,
   RoadEdge,
@@ -23,6 +25,8 @@ interface RoadEditorOverlayProps {
   onNodeClick: (nodeId: string, e: React.MouseEvent) => void;
   onEdgeClick: (fromId: string, toId: string, e: React.MouseEvent) => void;
   disconnectedNodeIds: Set<string>;
+  positions?: CampusPosition[];
+  onAccessPointDrag?: (posId: number, newPixel: PixelPoint) => void;
 }
 
 export const RoadEditorOverlay: React.FC<RoadEditorOverlayProps> = ({
@@ -40,15 +44,37 @@ export const RoadEditorOverlay: React.FC<RoadEditorOverlayProps> = ({
   onNodeClick,
   onEdgeClick,
   disconnectedNodeIds,
+  positions,
+  onAccessPointDrag,
 }) => {
   const draggingNodeIdRef = useRef<string | null>(null);
+  const draggingApIdRef = useRef<number | null>(null);
+
+  const handleApPointerDown = useCallback(
+    (posId: number, e: React.PointerEvent) => {
+      e.stopPropagation();
+      if (activeTool === 'select' || activeTool === 'draw') {
+        draggingApIdRef.current = posId;
+        try {
+          (e.currentTarget as Element).setPointerCapture(e.pointerId);
+        } catch {
+          // ignore
+        }
+      }
+    },
+    [activeTool]
+  );
 
   const handleNodePointerDown = useCallback(
     (nodeId: string, e: React.PointerEvent) => {
       e.stopPropagation();
       if (activeTool === 'select') {
         draggingNodeIdRef.current = nodeId;
-        (e.target as Element).setPointerCapture(e.pointerId);
+        try {
+          (e.currentTarget as Element).setPointerCapture(e.pointerId);
+        } catch {
+          // ignore
+        }
       }
     },
     [activeTool]
@@ -56,6 +82,21 @@ export const RoadEditorOverlay: React.FC<RoadEditorOverlayProps> = ({
 
   const handleNodePointerMove = useCallback(
     (e: React.PointerEvent) => {
+      if (draggingApIdRef.current !== null && onAccessPointDrag) {
+        e.stopPropagation();
+        const svg = (e.currentTarget as SVGElement).ownerSVGElement;
+        if (!svg) return;
+        const pt = svg.createSVGPoint();
+        pt.x = e.clientX;
+        pt.y = e.clientY;
+        const svgP = pt.matrixTransform(svg.getScreenCTM()?.inverse());
+        onAccessPointDrag(draggingApIdRef.current, {
+          x: Math.round(Math.max(0, Math.min(MAP_CONFIG.nativeWidth, svgP.x))),
+          y: Math.round(Math.max(0, Math.min(MAP_CONFIG.nativeHeight, svgP.y))),
+        });
+        return;
+      }
+
       if (draggingNodeIdRef.current && activeTool === 'select') {
         e.stopPropagation();
         // Native SVG coordinates derived from SVG element matrix
@@ -66,20 +107,30 @@ export const RoadEditorOverlay: React.FC<RoadEditorOverlayProps> = ({
         pt.y = e.clientY;
         const svgP = pt.matrixTransform(svg.getScreenCTM()?.inverse());
         onNodeDrag(draggingNodeIdRef.current, {
-          x: Math.round(Math.max(0, Math.min(1280, svgP.x))),
-          y: Math.round(Math.max(0, Math.min(774, svgP.y))),
+          x: Math.round(Math.max(0, Math.min(MAP_CONFIG.nativeWidth, svgP.x))),
+          y: Math.round(Math.max(0, Math.min(MAP_CONFIG.nativeHeight, svgP.y))),
         });
       }
     },
-    [activeTool, onNodeDrag]
+    [activeTool, onNodeDrag, onAccessPointDrag]
   );
 
   const handleNodePointerUp = useCallback(
     (e: React.PointerEvent) => {
+      if (draggingApIdRef.current !== null) {
+        e.stopPropagation();
+        try {
+          (e.currentTarget as Element).releasePointerCapture(e.pointerId);
+        } catch {
+          // ignore
+        }
+        draggingApIdRef.current = null;
+      }
+
       if (draggingNodeIdRef.current) {
         e.stopPropagation();
         try {
-          (e.target as Element).releasePointerCapture(e.pointerId);
+          (e.currentTarget as Element).releasePointerCapture(e.pointerId);
         } catch {
           // ignore
         }
@@ -181,6 +232,8 @@ export const RoadEditorOverlay: React.FC<RoadEditorOverlayProps> = ({
                 strokeWidth="18"
                 className="cursor-pointer"
                 style={{ pointerEvents: 'all' }}
+                data-no-pan="true"
+                onMouseDown={(e) => e.stopPropagation()}
                 onClick={(e) => onEdgeClick(edge.from, edge.to, e)}
               />
 
@@ -241,17 +294,18 @@ export const RoadEditorOverlay: React.FC<RoadEditorOverlayProps> = ({
               <g
                 transform={`translate(${ap.pixelCoord.x}, ${ap.pixelCoord.y})`}
                 filter="url(#editorGlow)"
-                className="pointer-events-none"
+                className="cursor-move pointer-events-auto"
+                onPointerDown={(e) => handleApPointerDown(ap.positionId, e)}
               >
                 <circle
-                  r={isTargeted ? '12' : '8'}
+                  r={isTargeted ? '13' : '9'}
                   fill={isTargeted ? '#ec4899' : '#f59e0b'}
                   stroke="#ffffff"
                   strokeWidth="2"
                   className={isTargeted ? 'animate-ping-slow' : ''}
                 />
                 <circle
-                  r="6"
+                  r="6.5"
                   fill={isTargeted ? '#db2777' : '#d97706'}
                   stroke="#ffffff"
                   strokeWidth="1.5"
@@ -269,28 +323,39 @@ export const RoadEditorOverlay: React.FC<RoadEditorOverlayProps> = ({
                 </text>
 
                 {/* Access Point Pill Label */}
-                <g transform="translate(0, -14)">
-                  <rect
-                    x="-24"
-                    y="-9"
-                    width="48"
-                    height="12"
-                    rx="3"
-                    fill="#1e293b"
-                    opacity="0.9"
-                  />
-                  <text
-                    x="0"
-                    y="-1"
-                    textAnchor="middle"
-                    fill="#fbbf24"
-                    fontSize="6.5"
-                    fontWeight="bold"
-                    fontFamily="sans-serif"
-                  >
-                    ACCESS {ap.positionId}
-                  </text>
-                </g>
+                {(() => {
+                  const bld = positions?.find((p) => p.id === ap.positionId);
+                  const labelText = bld
+                    ? `${bld.name.split('·')[0].trim()} Access`
+                    : `ACCESS ${ap.positionId}`;
+                  const boxWidth = Math.max(38, Math.round(labelText.length * 5.4 + 10));
+                  return (
+                    <g transform="translate(0, -15)">
+                      <rect
+                        x={-boxWidth / 2}
+                        y="-9"
+                        width={boxWidth}
+                        height="13"
+                        rx="3.5"
+                        fill="#0f172a"
+                        stroke="#f59e0b"
+                        strokeWidth="0.8"
+                        opacity="0.95"
+                      />
+                      <text
+                        x="0"
+                        y="-0.5"
+                        textAnchor="middle"
+                        fill="#fbbf24"
+                        fontSize="7"
+                        fontWeight="bold"
+                        fontFamily="sans-serif"
+                      >
+                        {labelText}
+                      </text>
+                    </g>
+                  );
+                })()}
               </g>
             </g>
           );
@@ -363,8 +428,13 @@ export const RoadEditorOverlay: React.FC<RoadEditorOverlayProps> = ({
               transform={`translate(${node.pixelCoord.x}, ${node.pixelCoord.y})`}
               className="cursor-pointer select-none group"
               style={{ pointerEvents: 'all' }}
+              data-no-pan="true"
+              data-interactive-node="true"
+              onMouseDown={(e) => e.stopPropagation()}
               onClick={(e) => onNodeClick(node.id, e)}
               onPointerDown={(e) => handleNodePointerDown(node.id, e)}
+              onPointerMove={handleNodePointerMove}
+              onPointerUp={handleNodePointerUp}
             >
               {/* Selection Halo */}
               {isSelected && (

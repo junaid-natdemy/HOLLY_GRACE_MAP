@@ -11,7 +11,6 @@ export interface MapTransformState {
 
 export function useMapTransform() {
   const [zoom, setZoom] = useState<number>(MAP_CONFIG.defaultZoom);
-  // On desktop: initial vertical offset so top navbar never overlaps Boys Hostel at (x:400, y:81).
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -51,7 +50,7 @@ export function useMapTransform() {
     if (typeof window !== 'undefined') {
       return { width: window.innerWidth, height: window.innerHeight };
     }
-    return { width: 1280, height: 774 };
+    return { width: MAP_CONFIG.nativeWidth, height: MAP_CONFIG.nativeHeight };
   });
 
   useEffect(() => {
@@ -80,10 +79,12 @@ export function useMapTransform() {
 
   // Fill the screen edge to edge, including the full width. The shorter
   // axis is cropped; panning stays inside the photo so no empty band opens.
-  const baseScale = Math.max(
-    containerSize.width / MAP_CONFIG.nativeWidth,
-    containerSize.height / MAP_CONFIG.nativeHeight
-  );
+  // Multiply by 1.002 to eliminate subpixel rounding gaps on Retina/fractional displays.
+  const baseScale =
+    Math.max(
+      containerSize.width / MAP_CONFIG.nativeWidth,
+      containerSize.height / MAP_CONFIG.nativeHeight
+    ) * 1.002;
 
   const stageWidth = MAP_CONFIG.nativeWidth * baseScale;
   const stageHeight = MAP_CONFIG.nativeHeight * baseScale;
@@ -91,13 +92,15 @@ export function useMapTransform() {
   const isAtMinZoom = zoom <= 1.001;
 
   /**
-   * Keep the photo covering the screen. Pan only as far as the leftover
-   * image on that side; never far enough to open an empty band.
+   * Strictly keep the photo covering the screen edge-to-edge.
+   * Clamps pan so that neither left, right, top, nor bottom gaps ever reveal
+   * the green background underneath.
    */
   const clampPan = useCallback(
     (targetPan: { x: number; y: number }, targetZoom: number): { x: number; y: number } => {
       const currentWidth = stageWidth * targetZoom;
       const currentHeight = stageHeight * targetZoom;
+
       const maxPanX = Math.max(0, (currentWidth - containerSize.width) / 2);
       const maxPanY = Math.max(0, (currentHeight - containerSize.height) / 2);
 
@@ -118,12 +121,12 @@ export function useMapTransform() {
   }, [clampPan, zoom]);
 
   /**
-   * Reset / Fit view to center (locked original size with desktop top clearance)
+   * Reset / Fit view to center (locked edge-to-edge coverage)
    */
   const resetView = useCallback(() => {
     setZoom(1.0);
-    setPan({ x: 0, y: 0 });
-  }, []);
+    setPan(clampPan({ x: 0, y: 0 }, 1.0));
+  }, [clampPan]);
 
   /**
    * Zoom in with smooth step
@@ -253,9 +256,22 @@ export function useMapTransform() {
     setZoom(zoomRef.current);
   }, []);
 
-  // Mouse drag. The picture moves on the compositor; React state updates when the drag ends.
+  // Mouse drag: ONLY moves when left mouse button is pressed down (e.buttons === 1).
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (e.button !== 0) return;
+
+    // Do NOT pan the map if clicking on an interactive marker, building, road node, boundary node, or control
+    const target = e.target as HTMLElement | SVGElement | null;
+    if (target) {
+      if (
+        target.closest(
+          'button, input, select, textarea, a, [data-no-pan], .campus-markers-layer, .road-editor-overlay-layer, .boundary-nodes, .boundary-edges, [data-interactive-node]'
+        )
+      ) {
+        return;
+      }
+    }
+
     gestureRef.current = true;
     draggingRef.current = true;
     setIsDragging(true);
@@ -265,7 +281,13 @@ export function useMapTransform() {
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
-      if (!draggingRef.current) return;
+      // strictly require dragging flag AND primary mouse button to be currently held down
+      if (!draggingRef.current || e.buttons !== 1) {
+        if (draggingRef.current) {
+          finishGesture();
+        }
+        return;
+      }
       const dx = e.clientX - lastMousePos.current.x;
       const dy = e.clientY - lastMousePos.current.y;
       lastMousePos.current = { x: e.clientX, y: e.clientY };
@@ -277,11 +299,24 @@ export function useMapTransform() {
         zoomRef.current
       );
     },
-    [clampPan]
+    [clampPan, finishGesture]
   );
 
   const handleMouseUp = useCallback(() => {
     finishGesture();
+  }, [finishGesture]);
+
+  // Window-level mouseup so releasing the mouse outside the canvas always stops dragging
+  useEffect(() => {
+    const handleGlobalMouseUp = () => {
+      if (draggingRef.current) {
+        finishGesture();
+      }
+    };
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => {
+      window.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
   }, [finishGesture]);
 
   // Double tap returns to the full campus. It does not zoom further in.

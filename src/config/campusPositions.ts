@@ -1,185 +1,442 @@
 import { CampusPosition } from '../types/campus';
 
+// Campus Positions Configuration (1 to 29)
+// Exported from HOLLY GRACE Development Mode
 export const CAMPUS_POSITIONS: CampusPosition[] = [
   {
-    id: 1,
-    name: "Silver Jubilee Block",
-    description: "Hostel and Academic wing near South Gate",
-    pixelCoord: {
-      x: 434,
-      y: 550
+    "id": 1,
+    "name": "Ephatha Block",
+    "description": "",
+    "pixelCoord": {
+      "x": 497,
+      "y": 661
     },
-    normalizedCoord: {
-      x: 0.3390625,
-      y: 0.710594315245478
+    "normalizedCoord": {
+      "x": 0.4409937888198758,
+      "y": 0.47349570200573066
     },
-    roadNetworkNodeId: "pos1",
-    category: "academic"
+    "roadNetworkNodeId": "node_53skt",
+    "category": "academic"
   },
   {
-    id: 2,
-    name: "CBSE School Block",
-    description: "Central Administrative & Classroom Complex",
-    pixelCoord: {
-      x: 794,
-      y: 382
+    "id": 2,
+    "name": "Silver Jubilee Block",
+    "description": "",
+    "pixelCoord": {
+      "x": 400,
+      "y": 869
     },
-    normalizedCoord: {
-      x: 0.6203125,
-      y: 0.4935400516795866
+    "normalizedCoord": {
+      "x": 0.354924578527063,
+      "y": 0.6224928366762178
     },
-    roadNetworkNodeId: "pos2",
-    category: "academic"
+    "roadNetworkNodeId": "node_53skt",
+    "category": "academic"
   },
   {
-    id: 3,
-    name: "ECCE Block",
-    description: "Auditorium & Laboratories via Covered Walkway",
-    pixelCoord: {
-      x: 816,
-      y: 502
+    "id": 3,
+    "name": "Pool",
+    "description": "",
+    "pixelCoord": {
+      "x": 360.6,
+      "y": 535.5
     },
-    normalizedCoord: {
-      x: 0.6375,
-      y: 0.648578811369509
+    "normalizedCoord": {
+      "x": 0.31996450754214734,
+      "y": 0.38359598853868193
     },
-    roadNetworkNodeId: "pos3",
-    category: "academic"
+    "roadNetworkNodeId": "node_53skt",
+    "category": "outdoor"
   },
   {
-    id: 4,
-    name: "Ground Stage",
-    description: "Open Arena and Festival Stage Complex",
-    pixelCoord: {
-      x: 821,
-      y: 262
+    "id": 4,
+    "name": "Boys Hostel",
+    "description": "",
+    "pixelCoord": {
+      "x": 107.2,
+      "y": 287.4
     },
-    normalizedCoord: {
-      x: 0.64140625,
-      y: 0.3385012919896641
+    "normalizedCoord": {
+      "x": 0.09511978704525288,
+      "y": 0.20587392550143266
     },
-    roadNetworkNodeId: "pos4",
-    category: "outdoor"
+    "roadNetworkNodeId": "node_53skt",
+    "category": "administrative"
   },
   {
-    id: 5,
-    name: "Pool",
-    description: "Central Covered Structure & Activity Center",
-    pixelCoord: {
-      x: 601,
-      y: 251
+    "id": 5,
+    "name": "College Block \u00b7 Engineering / Polytechnic",
+    "description": "",
+    "pixelCoord": {
+      "x": 356,
+      "y": 430.6
     },
-    normalizedCoord: {
-      x: 0.46953125,
-      y: 0.3242894056847545
+    "normalizedCoord": {
+      "x": 0.31588287488908606,
+      "y": 0.30845272206303725
     },
-    roadNetworkNodeId: "pos5",
-    category: "outdoor"
+    "roadNetworkNodeId": "node_53skt",
+    "category": "academic"
   },
   {
-    id: 6,
-    name: "College Block · Engineering / Polytechnic",
-    description: "Upper Campus Main Academic Ribbon",
-    pixelCoord: {
-      x: 656,
-      y: 189
+    "id": 6,
+    "name": "Stall",
+    "description": "",
+    "pixelCoord": {
+      "x": 556.6,
+      "y": 513.3
     },
-    normalizedCoord: {
-      x: 0.5125,
-      y: 0.2441860465116279
+    "normalizedCoord": {
+      "x": 0.4938775510204082,
+      "y": 0.36769340974212034
     },
-    roadNetworkNodeId: "pos6",
-    category: "academic"
+    "roadNetworkNodeId": "node_53skt",
+    "category": "commercial"
   },
   {
-    id: 7,
-    name: "Near Boys Hostel",
-    description: "Elevated Western Green Pavilion & Gazebo",
-    pixelCoord: {
-      x: 337,
-      y: 155
+    "id": 7,
+    "name": "Mana Block",
+    "description": "",
+    "pixelCoord": {
+      "x": 568.1,
+      "y": 730.7
     },
-    normalizedCoord: {
-      x: 0.26328125,
-      y: 0.20025839793281655
+    "normalizedCoord": {
+      "x": 0.5040816326530613,
+      "y": 0.5234240687679084
     },
-    roadNetworkNodeId: "pos7",
-    category: "administrative"
+    "roadNetworkNodeId": "node_53skt",
+    "category": "academic"
   },
   {
-    id: 8,
-    name: "Boys Hostel",
-    description: "Upper North Multi-story Block & Residential Hall",
-    pixelCoord: {
-      x: 400,
-      y: 81
+    "id": 8,
+    "name": "Main Enterance",
+    "description": "",
+    "pixelCoord": {
+      "x": 487,
+      "y": 879
     },
-    normalizedCoord: {
-      x: 0.3125,
-      y: 0.10465116279069768
+    "normalizedCoord": {
+      "x": 0.4321206743566992,
+      "y": 0.6296561604584527
     },
-    roadNetworkNodeId: "pos8",
-    category: "administrative"
+    "roadNetworkNodeId": "node_53skt",
+    "category": "gate"
   },
   {
-    id: 9,
-    name: "Zion Auditorium",
-    description: "Main Event Auditorium & Cultural Stage Complex",
-    pixelCoord: {
-      x: 988,
-      y: 333
+    "id": 9,
+    "name": "Bike Parking - 1",
+    "description": "",
+    "pixelCoord": {
+      "x": 542,
+      "y": 1059
     },
-    normalizedCoord: {
-      x: 0.771875,
-      y: 0.43023255813953487
+    "normalizedCoord": {
+      "x": 0.48092280390417036,
+      "y": 0.7585959885386819
     },
-    roadNetworkNodeId: "pos9",
-    category: "auditorium"
+    "roadNetworkNodeId": "node_53skt",
+    "category": "bike_parking"
   },
   {
-    id: 10,
-    name: "VIP Parking",
-    description: "Open Festival Ground & Parking Arena",
-    pixelCoord: {
-      x: 936,
-      y: 217
+    "id": 10,
+    "name": "Bike Parking - 2",
+    "description": "",
+    "pixelCoord": {
+      "x": 641,
+      "y": 912
     },
-    normalizedCoord: {
-      x: 0.73125,
-      y: 0.28036175710594313
+    "normalizedCoord": {
+      "x": 0.5687666370896185,
+      "y": 0.6532951289398281
     },
-    roadNetworkNodeId: "pos10",
-    category: "outdoor"
+    "roadNetworkNodeId": "node_53skt",
+    "category": "bike_parking"
   },
   {
-    id: 11,
-    name: "Zion Block",
-    description: "Engineering & Technical Wing",
-    pixelCoord: {
-      x: 1112.5,
-      y: 386.3
+    "id": 11,
+    "name": "Bike Parking - 3",
+    "description": "",
+    "pixelCoord": {
+      "x": 693,
+      "y": 914
     },
-    normalizedCoord: {
-      x: 0.869140625,
-      y: 0.4990956072351421
+    "normalizedCoord": {
+      "x": 0.6149068322981367,
+      "y": 0.6547277936962751
     },
-    roadNetworkNodeId: "node_mec1s",
-    category: "academic"
+    "roadNetworkNodeId": "node_53skt",
+    "category": "bike_parking"
   },
   {
-    id: 12,
-    name: "Stalls",
-    description: "Campus Refreshment & Festival Stalls",
-    pixelCoord: {
-      x: 912,
-      y: 275
+    "id": 12,
+    "name": "Bike Parking - 4",
+    "description": "",
+    "pixelCoord": {
+      "x": 647,
+      "y": 941
     },
-    normalizedCoord: {
-      x: 0.7125,
-      y: 0.355297157622739
+    "normalizedCoord": {
+      "x": 0.5740905057675244,
+      "y": 0.6740687679083095
     },
-    roadNetworkNodeId: "node_msu38",
-    category: "outdoor"
+    "roadNetworkNodeId": "node_53skt",
+    "category": "bike_parking"
+  },
+  {
+    "id": 13,
+    "name": "Bike Parking - 5",
+    "description": "",
+    "pixelCoord": {
+      "x": 697,
+      "y": 939
+    },
+    "normalizedCoord": {
+      "x": 0.6184560780834073,
+      "y": 0.6726361031518625
+    },
+    "roadNetworkNodeId": "node_53skt",
+    "category": "bike_parking"
+  },
+  {
+    "id": 14,
+    "name": "Staff Bike Parking",
+    "description": "",
+    "pixelCoord": {
+      "x": 566,
+      "y": 891
+    },
+    "normalizedCoord": {
+      "x": 0.5022182786157942,
+      "y": 0.6382521489971347
+    },
+    "roadNetworkNodeId": "node_53skt",
+    "category": "bike_parking"
+  },
+  {
+    "id": 15,
+    "name": "Normal Car Parking",
+    "description": "",
+    "pixelCoord": {
+      "x": 596.4,
+      "y": 826.4
+    },
+    "normalizedCoord": {
+      "x": 0.529192546583851,
+      "y": 0.5919770773638968
+    },
+    "roadNetworkNodeId": "node_53skt",
+    "category": "car_parking"
+  },
+  {
+    "id": 16,
+    "name": "Exit - 1",
+    "description": "",
+    "pixelCoord": {
+      "x": 1024,
+      "y": 565
+    },
+    "normalizedCoord": {
+      "x": 0.9086069210292813,
+      "y": 0.4047277936962751
+    },
+    "roadNetworkNodeId": "node_53skt",
+    "category": "gate"
+  },
+  {
+    "id": 17,
+    "name": "Exit 2",
+    "description": "",
+    "pixelCoord": {
+      "x": 960.9,
+      "y": 459.7
+    },
+    "normalizedCoord": {
+      "x": 0.8526175687666371,
+      "y": 0.329297994269341
+    },
+    "roadNetworkNodeId": "node_53skt",
+    "category": "gate"
+  },
+  {
+    "id": 18,
+    "name": "Exit Vip Parking - 3",
+    "description": "",
+    "pixelCoord": {
+      "x": 913.4,
+      "y": 674.1
+    },
+    "normalizedCoord": {
+      "x": 0.8104702750665483,
+      "y": 0.48287965616045847
+    },
+    "roadNetworkNodeId": "node_53skt",
+    "category": "vip_parking"
+  },
+  {
+    "id": 19,
+    "name": "Ground Vip Parking - 1",
+    "description": "",
+    "pixelCoord": {
+      "x": 535.9,
+      "y": 380.9
+    },
+    "normalizedCoord": {
+      "x": 0.47551020408163264,
+      "y": 0.2728510028653295
+    },
+    "roadNetworkNodeId": "node_53skt",
+    "category": "vip_parking"
+  },
+  {
+    "id": 20,
+    "name": "VIp Parking - 2",
+    "description": "",
+    "pixelCoord": {
+      "x": 412,
+      "y": 383
+    },
+    "normalizedCoord": {
+      "x": 0.36557231588287487,
+      "y": 0.27435530085959886
+    },
+    "roadNetworkNodeId": "node_53skt",
+    "category": "vip_parking"
+  },
+  {
+    "id": 21,
+    "name": "Zion Auditorium",
+    "description": "",
+    "pixelCoord": {
+      "x": 616,
+      "y": 597
+    },
+    "normalizedCoord": {
+      "x": 0.546583850931677,
+      "y": 0.4276504297994269
+    },
+    "roadNetworkNodeId": "node_53skt",
+    "category": "auditorium"
+  },
+  {
+    "id": 22,
+    "name": "Zion Block",
+    "description": "",
+    "pixelCoord": {
+      "x": 664.4,
+      "y": 631.3
+    },
+    "normalizedCoord": {
+      "x": 0.5895297249334516,
+      "y": 0.4522206303724928
+    },
+    "roadNetworkNodeId": "node_53skt",
+    "category": "academic"
+  },
+  {
+    "id": 23,
+    "name": "Divine Block",
+    "description": "",
+    "pixelCoord": {
+      "x": 540,
+      "y": 678
+    },
+    "normalizedCoord": {
+      "x": 0.47914818101153506,
+      "y": 0.48567335243553006
+    },
+    "roadNetworkNodeId": "node_53skt",
+    "category": "academic"
+  },
+  {
+    "id": 24,
+    "name": "Shalom Block",
+    "description": "",
+    "pixelCoord": {
+      "x": 478,
+      "y": 693
+    },
+    "normalizedCoord": {
+      "x": 0.4241348713398403,
+      "y": 0.49641833810888253
+    },
+    "roadNetworkNodeId": "node_53skt",
+    "category": "academic"
+  },
+  {
+    "id": 25,
+    "name": "Ecce Block",
+    "description": "",
+    "pixelCoord": {
+      "x": 531,
+      "y": 775
+    },
+    "normalizedCoord": {
+      "x": 0.47116237799467614,
+      "y": 0.5551575931232091
+    },
+    "roadNetworkNodeId": "node_53skt",
+    "category": "academic"
+  },
+  {
+    "id": 26,
+    "name": "Ground near Hostel",
+    "description": "",
+    "pixelCoord": {
+      "x": 118,
+      "y": 365
+    },
+    "normalizedCoord": {
+      "x": 0.10470275066548358,
+      "y": 0.2614613180515759
+    },
+    "roadNetworkNodeId": "node_53skt",
+    "category": "outdoor"
+  },
+  {
+    "id": 27,
+    "name": "Main Road Enterance",
+    "description": "",
+    "pixelCoord": {
+      "x": 652,
+      "y": 1201
+    },
+    "normalizedCoord": {
+      "x": 0.5785270629991127,
+      "y": 0.8603151862464183
+    },
+    "roadNetworkNodeId": "node_53skt",
+    "category": "gate"
+  },
+  {
+    "id": 28,
+    "name": "Ground Stage",
+    "description": "",
+    "pixelCoord": {
+      "x": 505.8,
+      "y": 529.1
+    },
+    "normalizedCoord": {
+      "x": 0.4488021295474712,
+      "y": 0.3790114613180516
+    },
+    "roadNetworkNodeId": "node_53skt",
+    "category": "stage_complex"
+  },
+  {
+    "id": 29,
+    "name": "Holy Grace Academy of Pharmacy",
+    "description": "",
+    "pixelCoord": {
+      "x": 927,
+      "y": 741.6
+    },
+    "normalizedCoord": {
+      "x": 0.8225377107364685,
+      "y": 0.5312320916905444
+    },
+    "roadNetworkNodeId": "node_l39v3",
+    "category": "academic"
   }
 ];
 
@@ -189,50 +446,7 @@ export const CAMPUS_POSITIONS: CampusPosition[] = [
  */
 export function formatBuildingDisplayName(rawName: string): string {
   if (!rawName) return '';
-  const trimmed = rawName.trim();
-
-  // Known legacy mappings to clean, standard, minimal names
-  const legacyMap: Record<string, string> = {
-    'SILVER JUBILEE BLOCK (NEW BLOCK)': 'Silver Jubilee Block',
-    'CBSE-SCHOO-BLOCK-EPHATHA & SHALOM': 'CBSE School Block',
-    'ECCE BLOCK (KG)': 'ECCE Block',
-    'GROUND STAGE': 'Ground Stage',
-    'POOL': 'Pool',
-    'COLLAGE-BLOCK_MBA_ENGINEERING_POLYTECHNIC': 'College Block',
-    'NEAR BOYS HOSTEL': 'Near Boys Hostel',
-    'BOYS HOSTEL': 'Boys Hostel',
-    'ZION AUDITORIUM': 'Zion Auditorium',
-    'VIP PARKING': 'VIP Parking',
-    'ZION BLOCK': 'Zion Block',
-    'STALLS': 'Stalls',
-    'South-West Complex': 'Silver Jubilee Block',
-    'Main Academic Block – Central': 'CBSE School Block',
-    'Auditorium Complex': 'ECCE Block',
-    'Central Covered Area': 'Pool',
-    'North-West Ribbon': 'College Block',
-    'Gazebo Pavilion': 'Near Boys Hostel',
-    'North Residential Block': 'Boys Hostel',
-    'East Event Ground': 'Zion Auditorium',
-    'Festival Arena': 'VIP Parking',
-  };
-
-  if (legacyMap[trimmed]) {
-    return legacyMap[trimmed];
-  }
-
-  // Convert raw underscores and hyphens to spaces
-  let clean = trimmed.replace(/_/g, ' ').replace(/-/g, ' ');
-
-  // If ALL CAPS or SCREAMING_SNAKE, convert to clean Title Case
-  if (clean === clean.toUpperCase() && clean.length > 2) {
-    clean = clean
-      .toLowerCase()
-      .split(' ')
-      .map((word) => (word ? word.charAt(0).toUpperCase() + word.slice(1) : ''))
-      .join(' ');
-  }
-
-  return clean;
+  return rawName.trim();
 }
 
 export function getPositionById(id: number, customPositions?: CampusPosition[]): CampusPosition | undefined {

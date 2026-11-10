@@ -13,16 +13,15 @@ export interface MapConfig {
 
 export const MAP_CONFIG: MapConfig = {
   // Configurable campus image path.
-  // When replacing with the clean production photograph (without numbered badges),
-  // simply update this path or replace public/campus_map_dev.png.
-  imageUrl: '/campus-map.webp',
-  nativeWidth: 1280,
-  nativeHeight: 774,
-  aspectRatio: 1280 / 774, // ~1.6537
+  // Updated with new campus photograph (1127x1396)
+  imageUrl: '/campus-map-new.png',
+  nativeWidth: 1127,
+  nativeHeight: 1396,
+  aspectRatio: 1127 / 1396, // ~0.8073
   minZoom: 1.0,
-  maxZoom: 2.8,
+  maxZoom: 3.5,
   defaultZoom: 1.0,
-  initialCenter: { x: 0.5, y: 0.45 },
+  initialCenter: { x: 0.5, y: 0.5 },
 };
 
 /**

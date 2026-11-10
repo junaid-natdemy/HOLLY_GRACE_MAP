@@ -22,6 +22,19 @@ export interface RoadNetworkData {
   accessPoints: Record<number, DestinationAccessPoint>;
 }
 
+export type CampusCategory =
+  | 'academic'
+  | 'stage_complex'
+  | 'outdoor'
+  | 'administrative'
+  | 'auditorium'
+  | 'gate'
+  | 'bike_parking'
+  | 'car_parking'
+  | 'vip_parking'
+  | 'commercial'
+  | string;
+
 export interface CampusPosition {
   id: number;
   name: string;
@@ -30,7 +43,7 @@ export interface CampusPosition {
   pixelCoord: PixelPoint;
   roadNetworkNodeId: string;
   accessPoint?: DestinationAccessPoint;
-  category: 'academic' | 'stage_complex' | 'outdoor' | 'administrative' | 'auditorium' | string;
+  category: CampusCategory;
 }
 
 export interface Stage {
@@ -66,6 +79,13 @@ export interface RoadGraph {
   adjacencyList: Record<string, { to: string; weight: number }[]>;
 }
 
+export interface WalkingConnector {
+  start: PixelPoint;
+  targetNode: PixelPoint;
+  svgPath: string; // Cubic Bezier SVG path
+  distancePx: number;
+}
+
 export interface RouteResult {
   pathNodeIds: string[];
   points: PixelPoint[];
@@ -73,6 +93,11 @@ export interface RouteResult {
   totalPixelDistance: number;
   calibratedDistanceMeters?: number;
   estimatedWalkingMinutes?: number;
+  startConnector?: WalkingConnector | null;
+  roadPoints?: PixelPoint[];
+  roadSvgPath?: string;
+  destinationConnector?: WalkingConnector | null;
+  targetPoint?: PixelPoint;
 }
 
 export interface GpsCoordinate {

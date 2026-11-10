@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CAMPUS_POSITIONS } from '../../config/campusPositions';
+import { pixelToNormalized } from '../../config/mapConfig';
 import {
   CalibrationPoint,
   GpsCoordinate,
@@ -99,10 +100,7 @@ export const CalibrationMode: React.FC<CalibrationModeProps> = ({
       id: `calib-${Date.now()}`,
       name,
       pixelCoord: tempPixelCoord,
-      normalizedCoord: {
-        x: tempPixelCoord.x / 1280,
-        y: tempPixelCoord.y / 774,
-      },
+      normalizedCoord: pixelToNormalized(tempPixelCoord),
       gpsCoord,
     };
 

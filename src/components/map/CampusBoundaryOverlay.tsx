@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { BoundaryEdge, BoundaryNode, PixelPoint } from '../../types/campus';
+import { MAP_CONFIG } from '../../config/mapConfig';
 
 export interface CampusBoundaryOverlayProps {
   nodes: Record<string, BoundaryNode>;
@@ -56,21 +57,27 @@ export const CampusBoundaryOverlay: React.FC<CampusBoundaryOverlayProps> = ({
     );
   }, [polygonPoints]);
 
-  // Inverted path: outer 1280x774 frame MINUS campus polygon (fills only outer forest)
+  // Inverted path: outer frame MINUS campus polygon (fills only outer forest)
   const invertedPathD = useMemo(() => {
     if (!perimeterPathD) return null;
-    return `M 0 0 L 1280 0 L 1280 774 L 0 774 Z ${perimeterPathD}`;
+    const w = MAP_CONFIG.nativeWidth;
+    const h = MAP_CONFIG.nativeHeight;
+    return `M 0 0 L ${w} 0 L ${w} ${h} L 0 ${h} Z ${perimeterPathD}`;
   }, [perimeterPathD]);
 
   const handlePointerDown = (nodeId: string, e: React.PointerEvent<SVGGElement>) => {
-    if (!isEditing) return;
     e.stopPropagation();
+    if (!isEditing) return;
 
     if (tool === 'move' && onNodeDrag) {
       draggingNodeIdRef.current = nodeId;
       setActiveDragId(nodeId);
       onSelectNode?.(nodeId);
-      e.currentTarget.setPointerCapture(e.pointerId);
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
     }
   };
 
@@ -88,8 +95,8 @@ export const CampusBoundaryOverlay: React.FC<CampusBoundaryOverlayProps> = ({
     const svgX = e.clientX * inv.a + e.clientY * inv.c + inv.e;
     const svgY = e.clientX * inv.b + e.clientY * inv.d + inv.f;
 
-    const clampedX = Math.round(Math.max(0, Math.min(1280, svgX)));
-    const clampedY = Math.round(Math.max(0, Math.min(774, svgY)));
+    const clampedX = Math.round(Math.max(0, Math.min(MAP_CONFIG.nativeWidth, svgX)));
+    const clampedY = Math.round(Math.max(0, Math.min(MAP_CONFIG.nativeHeight, svgY)));
 
     onNodeDrag(nodeId, { x: clampedX, y: clampedY });
   };
@@ -156,6 +163,8 @@ export const CampusBoundaryOverlay: React.FC<CampusBoundaryOverlayProps> = ({
             return (
               <g
                 key={edgeKey}
+                data-no-pan="true"
+                onMouseDown={(evt) => isDeleteMode && evt.stopPropagation()}
                 className={isDeleteMode ? 'cursor-pointer pointer-events-auto' : 'pointer-events-none'}
                 onMouseEnter={() => isDeleteMode && setHoveredEdgeKey(edgeKey)}
                 onMouseLeave={() => isDeleteMode && setHoveredEdgeKey(null)}
@@ -242,8 +251,11 @@ export const CampusBoundaryOverlay: React.FC<CampusBoundaryOverlayProps> = ({
             return (
               <g
                 key={node.id}
+                data-no-pan="true"
+                data-interactive-node="true"
                 transform={`translate(${node.pixelCoord.x}, ${node.pixelCoord.y})`}
                 className={`${cursor} transition-transform duration-75 hover:scale-125`}
+                onMouseDown={(e) => e.stopPropagation()}
                 onPointerDown={(e) => handlePointerDown(node.id, e)}
                 onPointerMove={(e) => handlePointerMove(node.id, e)}
                 onPointerUp={(e) => handlePointerUp(node.id, e)}

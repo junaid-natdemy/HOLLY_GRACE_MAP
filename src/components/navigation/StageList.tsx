@@ -1,7 +1,7 @@
 import React from 'react';
 import { getPositionById } from '../../config/campusPositions';
 import { Stage } from '../../types/campus';
-import { MapPin } from 'lucide-react';
+import { MapPin, Sparkles } from 'lucide-react';
 
 interface StageListProps {
   stages: Stage[];
@@ -47,7 +47,7 @@ export const StageList: React.FC<StageListProps> = ({
                     : 'bg-slate-100 text-slate-800'
                 }`}
               >
-                {stage.stageNumber}
+                {stage.stageNumber > 0 ? stage.stageNumber : <Sparkles className="w-4 h-4 text-amber-500" />}
               </div>
 
               {/* Stage Info */}
@@ -57,7 +57,7 @@ export const StageList: React.FC<StageListProps> = ({
                     isSelected ? 'text-emerald-950' : 'text-slate-800'
                   }`}
                 >
-                  Stage {stage.stageNumber}: {stage.name}
+                  {stage.stageNumber > 0 ? `Stage ${stage.stageNumber}: ${stage.name}` : stage.name}
                 </p>
                 <div className="flex items-center gap-1.5 text-xs text-slate-600 mt-0.5">
                   <MapPin className="w-3 h-3 text-slate-500 shrink-0" />

@@ -10,6 +10,7 @@ import {
   PanelLeftOpen,
   MapPin,
   Check,
+  ArrowLeft,
 } from 'lucide-react';
 import { formatBuildingDisplayName } from '../../config/campusPositions';
 import { DestinationSelectorPanel } from './DestinationSelectorPanel';
@@ -35,6 +36,8 @@ interface DesktopNavPanelProps {
   onToggleEditor?: () => void;
   isEditorOpen?: boolean;
   onLogoClick?: () => void;
+  hasParentWebsite?: boolean;
+  onBackToParent?: () => void;
 }
 
 export const DesktopNavPanel: React.FC<DesktopNavPanelProps> = ({
@@ -57,6 +60,8 @@ export const DesktopNavPanel: React.FC<DesktopNavPanelProps> = ({
   onToggleEditor,
   isEditorOpen = false,
   onLogoClick,
+  hasParentWebsite = false,
+  onBackToParent,
 }) => {
   const [isStartDropdownOpen, setIsStartDropdownOpen] = useState<boolean>(false);
   const [isInfoPanelOpen, setIsInfoPanelOpen] = useState<boolean>(true);
@@ -147,6 +152,19 @@ export const DesktopNavPanel: React.FC<DesktopNavPanelProps> = ({
         {/* 1. COMPACT FLOATING NAVBAR (Google Maps / Clean SaaS Style) */}
         <div className="w-full h-[38px] bg-white/95 backdrop-blur-xl rounded-[14px] shadow-[0_8px_30px_-6px_rgba(15,23,42,0.12)] border border-slate-200/80 px-1.5 py-1 flex items-center gap-1 transition-all select-none">
           
+          {/* Back to Parent Website Button (When arrived from Web A) */}
+          {hasParentWebsite && onBackToParent && (
+            <button
+              type="button"
+              onClick={onBackToParent}
+              className="h-7 px-2 rounded-md bg-slate-100 hover:bg-slate-200 active:scale-[0.98] text-slate-700 font-bold text-[9px] flex items-center gap-1 transition-all shrink-0 cursor-pointer border border-slate-200/60"
+              title="Return to Main Website"
+            >
+              <ArrowLeft className="w-2.5 h-2.5" />
+              <span>Back</span>
+            </button>
+          )}
+
           {/* STARTING LOCATION SECTION */}
           <div className="relative flex-1 min-w-0" ref={startDropdownRef}>
             <div
@@ -479,7 +497,7 @@ export const DesktopNavPanel: React.FC<DesktopNavPanelProps> = ({
                             : 'bg-slate-100 text-slate-700'
                         }`}
                       >
-                        {stg.stageNumber}
+                        {stg.stageNumber > 0 ? stg.stageNumber : '★'}
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-[10.5px] font-bold text-slate-900">

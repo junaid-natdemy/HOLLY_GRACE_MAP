@@ -2,240 +2,209 @@ import { Stage } from '../types/campus';
 
 /**
  * EXACT CAMPUS STAGE TO POSITION MAPPING
- * Exported from HOLLY GRACE Development Mode
+ * Configured with stages mapped to their campus buildings.
  */
 export const CAMPUS_STAGES: Stage[] = [
   {
-    stageNumber: 1,
-    name: "STAGE - 1 - EPHATHA AUDITORIUM",
-    positionId: 2,
-    category: "Main Block",
-    floor: "THIRD-FLOOR"
+    "stageNumber": 1,
+    "name": "Ephatha Auditorium",
+    "positionId": 1,
+    "floor": "3rd Floor"
   },
   {
-    stageNumber: 2,
-    name: "STAGE-2",
-    positionId: 2,
-    category: "Main Block",
-    floor: "VI-G (SECOND-FLOOR)"
+    "stageNumber": 3,
+    "name": "XI-E",
+    "positionId": 1,
+    "floor": "2nd Floor"
   },
   {
-    stageNumber: 3,
-    name: "STAGE-3",
-    positionId: 2,
-    category: "Main Block",
-    floor: "XI-E (SECOND-FLOOR)"
+    "stageNumber": 4,
+    "name": "XI-C / XI-F",
+    "positionId": 1,
+    "floor": "2nd Floor"
   },
   {
-    stageNumber: 4,
-    name: "STAGE-4",
-    positionId: 2,
-    category: "Main Block",
-    floor: "XI-C/XI-F (SECOND-FLOOR)"
+    "stageNumber": 5,
+    "name": "XII-C / XII-F",
+    "positionId": 1,
+    "floor": "2nd Floor"
   },
   {
-    stageNumber: 5,
-    name: "STAGE-5",
-    positionId: 2,
-    category: "Main Block",
-    floor: "XII-C/XII-F (SECOND-FLOOR)"
+    "stageNumber": 12,
+    "name": "12 A",
+    "positionId": 2,
+    "floor": "1st Floor"
   },
   {
-    stageNumber: 6,
-    name: "STAGE-6",
-    positionId: 2,
-    category: "Main Block",
-    floor: "VI-F (SECOND-FLOOR)"
+    "stageNumber": 13,
+    "name": "12 B",
+    "positionId": 2,
+    "floor": "2nd Floor"
   },
   {
-    stageNumber: 8,
-    name: "STAGE - 8",
-    positionId: 3,
-    category: "SE Annex",
-    floor: "ECCE-INNER-COURT(KG COURT)"
+    "stageNumber": 14,
+    "name": "11 A",
+    "positionId": 2,
+    "floor": "2nd Floor"
   },
   {
-    stageNumber: 9,
-    name: "STAGE - 9 ",
-    positionId: 4,
-    category: "Open Arena",
-    floor: "GROUND-STAGE-1"
+    "stageNumber": 10,
+    "name": "Swimming Area",
+    "positionId": 3,
+    "floor": "Outdoor"
   },
   {
-    stageNumber: 11,
-    name: "STAGE - 11",
-    positionId: 4,
-    category: "Open Arena",
-    floor: "GROUNDS-STAGE-2"
+    "stageNumber": 29,
+    "name": "Boys Hostel Ground",
+    "positionId": 4,
+    "floor": "Ground / Outdoor"
   },
   {
-    stageNumber: 10,
-    name: "STAGE-10",
-    positionId: 5,
-    category: "Central Pavilion",
-    floor: "SWIMMING-AREA"
+    "stageNumber": 15,
+    "name": "Robotics Lab",
+    "positionId": 5,
+    "floor": "Ground Floor"
   },
   {
-    stageNumber: 12,
-    name: "STAGE - 12",
-    positionId: 1,
-    category: "SW Complex",
-    floor: "12A-GROUND-FLOOR"
+    "stageNumber": 16,
+    "name": "Lecture Hall 1",
+    "positionId": 5,
+    "floor": "Ground Floor"
   },
   {
-    stageNumber: 13,
-    name: "STAGE - 13",
-    positionId: 1,
-    category: "SW Complex",
-    floor: "12B-FIRST-FLOOR"
+    "stageNumber": 17,
+    "name": "Lecture Hall 2",
+    "positionId": 5,
+    "floor": "Ground Floor"
   },
   {
-    stageNumber: 14,
-    name: "STAGE - 14",
-    positionId: 1,
-    category: "SW Complex",
-    floor: "11A-FIRST-FLOOR"
+    "stageNumber": 18,
+    "name": "MBA Seminar Hall",
+    "positionId": 5,
+    "floor": "1st Floor"
   },
   {
-    stageNumber: 16,
-    name: "STAGE 16 - College Block • MBA",
-    positionId: 6,
-    category: "North Wing",
-    floor: "Lecture Hall 1 • GROUND-FLOOR"
+    "stageNumber": 19,
+    "name": "S1/S2-A, LH103",
+    "positionId": 5,
+    "floor": "1st Floor"
   },
   {
-    stageNumber: 17,
-    name: "STAGE 17 - College Block • MBA",
-    positionId: 6,
-    category: "North Wing",
-    floor: "Lecture Hall 2 • GROUND-FLOOR"
+    "stageNumber": 20,
+    "name": "LH122 (opp. AI Lab)",
+    "positionId": 5,
+    "floor": "1st Floor"
   },
   {
-    stageNumber: 18,
-    name: "STAGE 18 - College Block • MBA",
-    positionId: 6,
-    category: "North Wing",
-    floor: "MBA Seminar Hall • FIRST-FLOOR"
+    "stageNumber": 21,
+    "name": "LH211 (Poly)",
+    "positionId": 5,
+    "floor": "2nd Floor"
   },
   {
-    stageNumber: 19,
-    name: "STAGE 19 - College Block • Engineering / Polytechnic",
-    positionId: 6,
-    category: "North Wing",
-    floor: "S1/S2-A, LH103 • FIRST-FLOOR"
+    "stageNumber": 22,
+    "name": "Seminar Hall SH218",
+    "positionId": 5,
+    "floor": "2nd Floor"
   },
   {
-    stageNumber: 20,
-    name: "STAGE 20 - College Block • Engineering / Polytechnic",
-    positionId: 6,
-    category: "North Wing",
-    floor: "LH122 - FIRST FLOOR (OPPOSITE AI LAP)"
+    "stageNumber": 23,
+    "name": "LH216",
+    "positionId": 5,
+    "floor": "2nd Floor"
   },
   {
-    stageNumber: 21,
-    name: "STAGE 21 - College Block • Engineering / Polytechnic",
-    positionId: 6,
-    category: "North Wing",
-    floor: "LH211 • SECOND FLOOR (POLYTECHNIC)"
+    "stageNumber": 24,
+    "name": "LH203",
+    "positionId": 5,
+    "floor": "2nd Floor"
   },
   {
-    stageNumber: 22,
-    name: "STAGE 22 - College Block • Engineering / Polytechnic",
-    positionId: 6,
-    category: "North Wing",
-    floor: "Seminar Hall SH218 • SECOND FLOOR"
+    "stageNumber": 25,
+    "name": "LH116",
+    "positionId": 5,
+    "floor": "1st Floor"
   },
   {
-    stageNumber: 23,
-    name: "STAGE 23 - College Block • Engineering / Polytechnic",
-    positionId: 6,
-    category: "North Wing",
-    floor: "LH216 • SECOND-FLOOR"
+    "stageNumber": 26,
+    "name": "Room 118",
+    "positionId": 5,
+    "floor": "1st Floor"
   },
   {
-    stageNumber: 24,
-    name: "STAGE 24 - College Block • Engineering / Polytechnic",
-    positionId: 6,
-    category: "North Wing",
-    floor: "LH203 • SECOND-FLOOR"
+    "stageNumber": 27,
+    "name": "CL107 (opp. Exam Cell)",
+    "positionId": 5,
+    "floor": "1st Floor"
   },
   {
-    stageNumber: 25,
-    name: "STAGE 25 - College Block • Engineering / Polytechnic",
-    positionId: 6,
-    category: "North Wing",
-    floor: "LH116 • FIRST-LOOR"
+    "stageNumber": 28,
+    "name": "Seminar Hall 123",
+    "positionId": 5,
+    "floor": "1st Floor"
   },
   {
-    stageNumber: 26,
-    name: "STAGE 26 - College Block • Engineering / Polytechnic",
-    positionId: 6,
-    category: "North Wing",
-    floor: "Room 118 • FIRST-FLOOR"
+    "stageNumber": 0,
+    "name": "Main Stage",
+    "positionId": 21,
+    "floor": "Main Floor"
   },
   {
-    stageNumber: 27,
-    name: "STAGE 27 - College Block • Engineering / Polytechnic",
-    positionId: 6,
-    category: "North Wing",
-    floor: "CL107 • FIRST-FLOOR  (OPPOSITE EXAM CELL)"
+    "stageNumber": 7,
+    "name": "Lunch Area Stage",
+    "positionId": 22,
+    "floor": "Ground Floor"
   },
   {
-    stageNumber: 28,
-    name: "STAGE 28 - College Block • Engineering / Polytechnic",
-    positionId: 6,
-    category: "North Wing",
-    floor: "Seminar Hall 123 •FIRST-FLOOR"
+    "stageNumber": 2,
+    "name": "VI-G",
+    "positionId": 24,
+    "floor": "2nd Floor"
   },
   {
-    stageNumber: 29,
-    name: "STAGE - 29",
-    positionId: 8,
-    category: "Hilltop",
-    floor: "BOYS-HOSTEL-GROUND"
+    "stageNumber": 6,
+    "name": "VI-F",
+    "positionId": 24,
+    "floor": "2nd Floor"
   },
   {
-    stageNumber: 30,
-    name: "STAGE - 30",
-    positionId: 7,
-    category: "Hillcrest"
+    "stageNumber": 8,
+    "name": "ECCE inner court (KG Court)",
+    "positionId": 25,
+    "floor": "Ground Floor"
   },
   {
-    stageNumber: 31,
-    name: "STAGE - 31",
-    positionId: 7,
-    category: "Hillcrest"
+    "stageNumber": 30,
+    "name": "Near Hostel \u00b7 Stage 1",
+    "positionId": 26,
+    "floor": "Outdoor"
   },
   {
-    stageNumber: 32,
-    name: "STAGE -32",
-    positionId: 7,
-    category: "Hillcrest"
+    "stageNumber": 31,
+    "name": "Near Hostel \u00b7 Stage 2",
+    "positionId": 26,
+    "floor": "Outdoor"
   },
   {
-    stageNumber: 33,
-    name: "MAIN-STAGE",
-    positionId: 9,
-    category: "Main Stage"
+    "stageNumber": 32,
+    "name": "Near Hostel \u00b7 Stage 3",
+    "positionId": 26,
+    "floor": "Outdoor"
   },
   {
-    stageNumber: 7,
-    name: "STAGE-7",
-    positionId: 11,
-    floor: "LUNCH-AREA-STAGE"
+    "stageNumber": 9,
+    "name": "Ground Stage 1",
+    "positionId": 28,
+    "floor": "Outdoor"
   },
   {
-    stageNumber: 15,
-    name: "STAGE-15 -College Block · Engineering / Polytechnic",
-    positionId: 6,
-    category: "North Wing",
-    floor: "Robotics Lab · GROUND FLOOR"
+    "stageNumber": 11,
+    "name": "Ground Stage 2",
+    "positionId": 28,
+    "floor": "Outdoor"
   }
 ];
 
-/**
- * Return deep clone of verified default baseline stages
- */
 export function getDefaultCampusStages(): Stage[] {
   return JSON.parse(JSON.stringify(CAMPUS_STAGES));
 }
@@ -265,14 +234,14 @@ export function searchStages(query: string, customStages?: Stage[]): Stage[] {
   if (!trimmed) return list;
 
   const num = parseInt(trimmed, 10);
-  if (!isNaN(num)) {
+  if (!isNaN(num) && num > 0) {
     return list.filter((s) => s.stageNumber === num);
   }
 
   return list.filter(
     (s) =>
       s.name.toLowerCase().includes(trimmed) ||
-      `stage ${s.stageNumber}`.toLowerCase().includes(trimmed) ||
+      (s.stageNumber > 0 && `stage ${s.stageNumber}`.toLowerCase().includes(trimmed)) ||
       (s.category && s.category.toLowerCase().includes(trimmed)) ||
       (s.floor && s.floor.toLowerCase().includes(trimmed))
   );
