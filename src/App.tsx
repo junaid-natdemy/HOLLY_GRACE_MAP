@@ -1515,7 +1515,9 @@ export const App: React.FC = () => {
   useEffect(() => {
     let active = true;
     const img = new Image();
-    const isRetina = typeof window !== 'undefined' && window.devicePixelRatio > 1;
+    const nav = typeof navigator !== 'undefined' ? (navigator as unknown as { connection?: { saveData?: boolean; effectiveType?: string } }) : null;
+    const isSlowOrDataSaver = Boolean(nav?.connection?.saveData || nav?.connection?.effectiveType === '2g');
+    const isRetina = typeof window !== 'undefined' && window.devicePixelRatio > 1 && !isSlowOrDataSaver;
     img.src = isRetina ? '/campus-map-hd.webp' : '/campus-map-new.webp';
     const onDecoded = () => {
       if (active) setMapImageReady(true);
